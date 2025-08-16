@@ -11,6 +11,10 @@ import MainLayout from './components/layout/MainLayout';
 import DashboardPage from './features/dashboard/pages/DashboardPage';
 import { LogIn } from 'lucide-react';
 
+// User management routes
+import UserListPage from './features/users/pages/UserListPage';
+import UserForm from './features/users/components/UserForm';
+
 function App() {
   return (
     <Router>
@@ -38,7 +42,27 @@ function App() {
             <DashboardPage />
           </MainLayout>
         } />
-      </Routes>
+
+        <Route path="/users" element={
+          <MainLayout>
+            <UserListPage />
+          </MainLayout>
+        } />
+
+        <Route path="/users/new" element={
+          <MainLayout>
+            <UserForm />
+          </MainLayout>
+        } />
+
+        <Route path="/users/edit/:id" element={
+          <MainLayout>
+            <UserForm isEdit={true} /> 
+          </MainLayout>
+        } />
+
+
+      </Routes> 
     </Router>
   );
 }

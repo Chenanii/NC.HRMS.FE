@@ -1,17 +1,38 @@
 import { Link, useLocation } from "react-router-dom";
 import "../../index.css"; 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
 
 export default function Sidebar() {
   const location = useLocation();
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const menuItems = [
     { path: "/dashboard", icon: "fas fa-home", label: "Dashboard" },
-    { path: "/users", icon: "fas fa-user", label: "Employees" },
+    {
+      icon: "fas fa-user",
+      label: "Employees",
+      dropdown: [
+        { path: "/users", label: "All Employees" },
+        { path: "/users/new", label: "Add Employee" },
+        { path: "/users/roles", label: "Roles" }
+      ]
+    },
     { path: "/leave", icon: "fas fa-calendar-alt", label: "Leave Requests" },
     { path: "/payroll", icon: "fas fa-money-check-alt", label: "Payroll" },
-    { path: "/settings", icon: "fas fa-cogs", label: "Settings" },
+    {
+      icon: "fas fa-cogs",
+      label: "Settings",
+      dropdown: [
+        { path: "/settings/profile", label: "Profile" },
+        { path: "/settings/account", label: "Account" }
+      ]
+    }
   ];
+
+  const handleDropdown = (label) => {
+    setOpenDropdown(openDropdown === label ? null : label);
+  };
 
   return (
     <motion.aside
@@ -33,7 +54,56 @@ export default function Sidebar() {
 
       <nav className="sidebar-nav">
         {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = item.path
+            ? location.pathname === item.path
+            : item.dropdown?.some((d) => location.pathname === d.path);
+
+          if (item.dropdown) {
+            return (
+              <div key={item.label} className={`sidebar-link dropdown ${isActive ? "active" : ""}`}>
+                <div
+                  className="dropdown-toggle"
+                  onClick={() => handleDropdown(item.label)}
+                  tabIndex={0}
+                  style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                >
+                  <motion.i
+                    className={item.icon}
+                    whileHover={{ scale: 1.2 }}
+                    transition={{ type: "spring", stiffness: 200 }}
+                  ></motion.i>
+                  <span style={{ marginLeft: 8 }}>{item.label}</span>
+                  <i
+                    className={`fas fa-chevron-${openDropdown === item.label ? "up" : "down"}`}
+                    style={{ marginLeft: "auto", fontSize: 12 }}
+                  ></i>
+                </div>
+                <AnimatePresence>
+                  {openDropdown === item.label && (
+                    <motion.div
+                      className="dropdown-menu"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {item.dropdown.map((sub) => (
+                        <Link
+                          key={sub.path}
+                          to={sub.path}
+                          className={`dropdown-item${location.pathname === sub.path ? " active" : ""}`}
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          }
+
           return (
             <Link
               key={item.path}
