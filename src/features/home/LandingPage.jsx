@@ -112,7 +112,7 @@ export default function EnhancedNcHrmsLanding() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-                <img src={logo} alt="NC.HRMS" className="h-12 w-auto" />
+                <img src={logo} alt="NC.HRMS" className="h-12 w-auto filter drop-shadow-lg" />
            </motion.a>
 
           <div className="flex-1 flex items-center justify-center gap-8">
@@ -174,12 +174,12 @@ export default function EnhancedNcHrmsLanding() {
                 <div className="border-t border-gray-200 my-2"></div>
                 
                 <div className="pt-2">
-                  <a 
-                    href="#"
+                  <Link
+                  to="/login"
                     className="flex items-center justify-center gap-2 rounded-lg px-6 py-3 bg-green-700 text-white font-semibold hover:bg-green-800 transition-colors shadow-md"
                   >
                     Login to Your Account
-                  </a>
+                  </Link>
                 </div>
               </div>
             </motion.div>
