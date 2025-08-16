@@ -1,6 +1,7 @@
 import DashboardCard from "../components/DashboardCard";
 import { motion } from "framer-motion";
 import "../../../index.css"; 
+import NotificationPanel from "../../../components/layout/Notifications";
 
 export default function DashboardPage() {
   const cardData = [
@@ -33,6 +34,7 @@ export default function DashboardPage() {
           />
         ))}
       </motion.div>
+
     </div>
   );
 }
