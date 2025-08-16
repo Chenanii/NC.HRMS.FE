@@ -4,9 +4,12 @@ module.exports = {
     extend: {
       colors: {
         classicBlue: "#003366",
-        classicGold: "#D4AF37",
+        classicGold: "#38733F",
         classicBurgundy: "#800020",
         classicCream: "#F5F5DC",
+        brand: {
+          green: "#38733F", // exact green from logo
+        },
       },
       fontFamily: {
         classic: ['system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
