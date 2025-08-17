@@ -488,7 +488,7 @@ const RegistrationForm = () => {
         <div className="relative z-10">
           {/* Header */}
           <div className="text-center p-6 pb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-green-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
               <User className="w-8 h-8 text-white"/>
             </div>
             <h1 className="text-xl font-bold text-gray-900 mb-1">Create Your Account</h1>
@@ -558,7 +558,7 @@ const RegistrationForm = () => {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isLoading}
-                  className="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                  className="px-6 py-2 bg-green-800 hover:from-green-700 hover:to-blue-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
                 >
                   {isLoading ? (
                     <span className="flex items-center">
@@ -577,8 +577,8 @@ const RegistrationForm = () => {
           <div className="text-center p-4 pt-0 border-t border-gray-100/50">
             <p className="text-xs text-gray-600">
               Already have an account?{' '}
-              <a href="/login" className="text-transparent bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text hover:from-green-500 hover:to-blue-500 font-medium transition-all duration-200">
-                Sign in
+              <a href="/login" className="text-transparent bg-green-600 bg-clip-text hover:from-green-500 hover:to-blue-500 font-medium transition-all duration-200">
+                Login
               </a>
             </p>
           </div>
