@@ -133,7 +133,7 @@ export default function LoginPage() {
               <Lock className="w-6 h-6 text-white"/>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-1">Welcome Back</h2>
-            <p className="text-gray-600 text-xs">Sign in to your account</p>
+            <p className="text-gray-600 text-xs">Login to your account</p>
           </div>
 
           {/* Error Alert */}
@@ -223,7 +223,7 @@ export default function LoginPage() {
                   Signing in...
                 </span>
               ) : (
-                "Sign In"
+                "Login"
               )}
             </button>
           </div>
