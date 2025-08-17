@@ -1,22 +1,20 @@
-import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
-import NotificationPanel from "./Notifications";
 
 export default function MainLayout({ children }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(prev => !prev);
-  };
-
   return (
-    <>
-      {isSidebarOpen && <Sidebar />}
-      <div style={{ marginLeft: isSidebarOpen ? "240px" : "0", transition: "margin-left 0.3s" }}>
-        <Navbar onToggleSidebar={toggleSidebar} />
-        <main>{children}</main>
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main Content */}
+      <div className="flex flex-col flex-1">
+        {/* Top Navbar */}
+        <Navbar />
+
+        {/* Page Content */}
+        <main className="p-6">{children}</main>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,19 +1,11 @@
-import { motion } from "framer-motion";
-
 export default function DashboardCard({ icon, title, value }) {
   return (
-    <motion.div
-      className="dashboard-card"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      whileHover={{ scale: 1.05, boxShadow: "0 8px 20px rgba(0,0,0,0.15)" }}
-    >
-      <i className={icon}></i>
+    <div className="bg-white shadow rounded-xl p-6 flex items-center space-x-4 hover:shadow-lg transition">
+      <div className="text-blue-500 text-3xl">{icon}</div>
       <div>
-        <h3>{title}</h3>
-        <p>{value}</p>
+        <p className="text-gray-500">{title}</p>
+        <h2 className="text-2xl font-bold">{value}</h2>
       </div>
-    </motion.div>
+    </div>
   );
 }
