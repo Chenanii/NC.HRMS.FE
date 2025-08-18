@@ -280,7 +280,7 @@ function NotificationPanel() {
 
 export default function DashboardPage() {
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-9xl mx-auto">
       {/* Header */}
       <div className="mb-6 lg:mb-8">
         <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">

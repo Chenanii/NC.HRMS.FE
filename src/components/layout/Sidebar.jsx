@@ -1,4 +1,6 @@
 import { useState } from "react";
+import logo from "../../assets/images/logo.png";
+
 import { 
   Menu, 
   X, 
@@ -58,12 +60,20 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, isMobile }) {
       >
         {/* Logo & Toggle */}
         <div className="flex items-center justify-between p-4 border-b">
-          <span
-            className={`text-lg font-bold text-gray-800 transition-all ${
-              sidebarOpen ? "block" : "hidden"
-            }`}
-          >
-            HRMS
+            <img
+              src={logo}
+              alt="HRMS Logo"
+              className="w-8 h-8 rounded shadow"
+              style={{ background: "#fff" }}
+            />
+            <span
+              className={`text-lg font-bold text-gray-800 transition-all ${
+                sidebarOpen ? "block" : "hidden"
+              }`}
+            >
+
+            HRMS  
+
           </span>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
