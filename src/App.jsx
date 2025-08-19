@@ -4,6 +4,7 @@ import LoginPage from './features/auth/pages/LoginPage';
 import Register from './features/auth/pages/Register'; 
 import LandingPage from './features/home/LandingPage'; 
 import EmailSent from './features/auth/pages/Email-Sent'; 
+import EmailConfirm from './features/auth/pages/Email-Confirm'; 
 import './index.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -40,6 +41,12 @@ function App() {
         <Route path="/email-sent" element={
           <Container size="sm" mt="xl">
             <EmailSent />
+          </Container>
+        } />
+
+          <Route path="/email-confirm" element={
+          <Container size="sm" mt="xl">
+            <EmailConfirm />
           </Container>
         } />
 
