@@ -92,7 +92,7 @@ const RegistrationForm = () => {
         } else if (formData.subdomain.length < 3) {
           newErrors.subdomain = 'Must be at least 3 characters';
         } else if (subdomainCheck.lastChecked === formData.subdomain && subdomainCheck.isAvailable === false) {
-          newErrors.subdomain = 'This subdomain is already taken';
+          newErrors.subdomain = 'This Workspace name is already taken';
         } else if (subdomainCheck.isChecking || (formData.subdomain !== subdomainCheck.lastChecked && formData.subdomain.length >= 3)) {
           newErrors.subdomain = 'Checking availability...';
         }
@@ -253,7 +253,7 @@ const RegistrationForm = () => {
 
             <div>
               <label htmlFor="subdomain" className="block text-sm font-medium text-gray-700 mb-1">
-                Workspace URL *
+                Workspace Name *
               </label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
