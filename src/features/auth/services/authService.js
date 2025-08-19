@@ -1,27 +1,44 @@
-// import axios from "../../../services/axios"; // Assuming this is your axios instance
+import axios from "axios";
 
-// Login function (same as before)
-export async function login(credentials) {
+const API_URL = "https://nthaka.com/hrms/api/Auth";
+
+// Login request
+export const login = async (form) => {
   try {
-    const response = await axios.post("/api/auth/login", credentials);
+    const response = await axios.post(`${API_URL}/login`, {
+      email: form.email,
+      password: form.password,
+    });
+
     return response.data;
   } catch (error) {
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    throw new Error("Login request failed");
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Login failed";
+    throw new Error(message);
   }
-}
+};
 
-// Register function (newly added)
-export async function registerUser(userData) {
+// Register request
+export const register = async (form) => {
   try {
-    const response = await axios.post("/api/auth/register", userData);
-    return response.data;  // Assuming the backend returns user data or a success message
+    const response = await axios.post(`${API_URL}/register`, {
+      firstname: form.firstname,
+      lastname: form.lastname,
+      email: form.email,
+      company: form.company,
+      subdomain: form.subdomain,
+      password: form.password,
+      confirmPassword: form.confirmPassword,
+    });
+
+    return response.data;
   } catch (error) {
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    throw new Error("Registration request failed");
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Registration failed";
+    throw new Error(message);
   }
-}
+};
