@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "https://nthaka.com/hrms/api/Auth";
+const API_BASE_URL = "https://nthaka.com/hrms/api/Auth";
 
 // Login request
 export const login = async (form) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, {
+    const response = await axios.post(`${API_BASE_URL}/login`, {
       email: form.email,
       password: form.password,
     });
@@ -23,7 +23,7 @@ export const login = async (form) => {
 
 export async function registerUser(payload) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/register`, payload, {
+    const response = await axios.post(`${API_BASE_URL}/register`, payload, {
       headers: {
         "Content-Type": "application/json"
       }
@@ -50,12 +50,10 @@ export const checkSubdomainAvailability = async (subdomain) => {
 
   try {
   const response = await axios.post(
-      `${API_BASE_URL}/auth/check-subdomain`,
+      `${API_BASE_URL}/check-subdomain`,
       JSON.stringify(subdomain),
       { headers: { "Content-Type": "application/json" } }
     );
-
-    console.log("Subdomain check response:", response.data);
 
     // Available when isError is false
     return response.data?.isError === false;
@@ -68,7 +66,7 @@ export const checkSubdomainAvailability = async (subdomain) => {
 };
 
 export const resendConfirmationEmail = async (email) => {
-  const response = await fetch(`${API_BASE_URL}}/auth/resend-confirmation`, {
+  const response = await fetch(`${API_BASE_URL}}/resend-confirmation`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

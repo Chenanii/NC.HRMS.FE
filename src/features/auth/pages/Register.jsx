@@ -285,7 +285,7 @@ const RegistrationForm = () => {
               </div>
               
               <p className="mt-1 text-xs text-gray-500">
-                {formData.subdomain || 'your-company'}.nchrms.com
+                www.nexacircuit-hrms.com/{formData.subdomain || 'your-company'}
               </p>
               
               {subdomainCheck.lastChecked === formData.subdomain && formData.subdomain && (
