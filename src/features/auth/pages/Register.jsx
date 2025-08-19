@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Eye, EyeOff, Building, User, Mail, Briefcase, Globe, Check, X, Loader2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { registerUser } from "../services/authService"; 
+import { checkSubdomainAvailability } from "../services/authService"; 
 
 const RegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -12,7 +14,7 @@ const RegistrationForm = () => {
     subdomain: '',
     jobTitle: ''
   });
-
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -28,15 +30,6 @@ const RegistrationForm = () => {
     { id: 3, title: 'Security', fields: ['password'] }
   ];
 
-  // Simulated API call to check subdomain availability
-  const checkSubdomainAvailability = async (subdomain) => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    const takenSubdomains = ['admin', 'api', 'www', 'app', 'dashboard', 'support', 'help', 'blog', 'docs', 'mail', 'ftp', 'test', 'dev', 'staging'];
-    const isAvailable = !takenSubdomains.includes(subdomain.toLowerCase());
-    return isAvailable;
-  };
-
-  // Debounced subdomain check
   const debouncedCheckSubdomain = useCallback(
     (() => {
       let timeout;
@@ -139,14 +132,24 @@ const RegistrationForm = () => {
     if (!validateStep(currentStep)) return;
 
     setIsLoading(true);
-    
+    setFeedback({ type: "", message: "" });
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Registration data:', formData);
-      alert('Registration successful!');
+      const result = await registerUser(formData);
+      setFeedback({ type: "success", message: "Registration successful!" });
+
+      const response = result?.data || {};
+      
+      setTimeout(() => {
+        window.location.href = "/email-sent";
+      }, 1500);
+
     } catch (error) {
-      console.error('Registration failed:', error);
-      alert('Registration failed. Please try again.');
+      console.error("Registration failed:", error);
+
+      // if backend sends details use them, else fallback
+      const errorMsg = error?.response?.data?.message || error.message || "Something went wrong. Please try again.";
+      setFeedback({ type: "error", message: errorMsg });
     } finally {
       setIsLoading(false);
     }
@@ -525,6 +528,23 @@ const RegistrationForm = () => {
               ))}
             </div>
           </div>
+          {feedback.message && (
+            <div
+              className={`mb-4 px-4 py-2 rounded-lg text-sm flex items-center ${
+                feedback.type === "success"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
+              }`}
+            >
+              {feedback.type === "success" ? (
+                <Check className="w-4 h-4 mr-2 text-green-600" />
+              ) : (
+                <X className="w-4 h-4 mr-2 text-red-600" />
+              )}
+              {feedback.message}
+            </div>
+          )}
+
 
           {/* Form Content */}
           <div className="px-6 pb-6">
@@ -585,7 +605,7 @@ const RegistrationForm = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }

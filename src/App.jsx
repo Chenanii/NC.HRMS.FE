@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from './features/auth/pages/LoginPage';
 import Register from './features/auth/pages/Register'; 
 import LandingPage from './features/home/LandingPage'; 
+import EmailSent from './features/auth/pages/Email-Sent'; 
 import './index.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -33,6 +34,12 @@ function App() {
        <Route path="/login" element={
           <Container size="sm" mt="xl">
             <LoginPage />
+          </Container>
+        } />
+
+        <Route path="/email-sent" element={
+          <Container size="sm" mt="xl">
+            <EmailSent />
           </Container>
         } />
 
