@@ -9,8 +9,7 @@ import './index.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Dashboard routes
-import MainLayout from './components/layout/MainLayout';
-import DashboardPage from './features/dashboard/pages/DashboardPage';
+import Dashboard from './features/dashboard/pages/Dashboard';
 import { LogIn } from 'lucide-react';
 
 // User management routes
@@ -52,27 +51,19 @@ function App() {
 
         {/* Protected routes (after login) */}
         <Route path="/dashboard" element={
-          <MainLayout>
-            <DashboardPage />
-          </MainLayout>
+            <Dashboard />
         } />
 
         <Route path="/users" element={
-          <MainLayout>
             <UserListPage />
-          </MainLayout>
         } />
 
         <Route path="/users/new" element={
-          <MainLayout>
             <UserForm />
-          </MainLayout>
         } />
 
         <Route path="/users/edit/:id" element={
-          <MainLayout>
             <UserForm isEdit={true} /> 
-          </MainLayout>
         } />
 
 

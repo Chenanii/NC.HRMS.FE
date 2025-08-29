@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainLayout from "../components/layout/MainLayout";
-import DashboardPage from "../features/dashboard/pages/DashboardPage";
+import Dashboard from "../features/dashboard/pages/Dashboard";
 
 export default function AppRoutes() {
   return (
@@ -8,11 +7,7 @@ export default function AppRoutes() {
       <Routes>
         <Route
           path="/dashboard"
-          element={
-            <MainLayout>
-              <DashboardPage />
-            </MainLayout>
-          }
+          element={<Dashboard />}
         />
       </Routes>
     </Router>
