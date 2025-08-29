@@ -268,7 +268,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
       }`}>
         {/* Logo */}
         <div className="p-4 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-gray-800">HRMS Pro</h1>
+          <h1 className="text-xl font-bold text-gray-800">NC.HRMS Pro</h1>
           <p className="text-sm text-gray-500">Human Resources</p>
         </div>
 
