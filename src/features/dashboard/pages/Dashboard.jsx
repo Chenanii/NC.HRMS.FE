@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import TopBar from '../components/TopBar';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../components/SideBar';
 import DashboardContent from '../components/DashboardContent';
 
 const Dashboard = () => {
