@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';   // <-- add this import
 import TopBar from '../components/TopBar';
-import Sidebar from '../components/Sidebar';
-import DashboardContent from '../components/DashboardContent';
+import Sidebar from '../components/SideBar';
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -29,7 +29,7 @@ const Dashboard = () => {
 
         {/* Scrollable content */}
         <main className="flex-1 overflow-y-auto">
-          <DashboardContent activeItem={activeItem} />
+          <Outlet />   
         </main>
       </div>
     </div>

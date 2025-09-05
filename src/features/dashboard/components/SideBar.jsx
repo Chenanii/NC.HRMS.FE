@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { NavLink } from "react-router-dom";
+
 import { 
   Users, 
   Building2, 
@@ -43,140 +45,140 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
   };
 
   const navigationItems = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: Home,
-      path: '/dashboard',
-      permission: 'analytics.dashboard'
-    },
-    {
-      id: 'management',
-      label: 'Management',
-      icon: Users,
-      isSection: true,
-      children: [
-        {
-          id: 'employees',
-          label: 'Employees',
-          icon: Users,
-          path: '/employees',
-          permission: 'employees.view',
-          badge: '124'
-        },
-        {
-          id: 'departments',
-          label: 'Departments',
-          icon: Building2,
-          path: '/departments',
-          permission: 'departments.view'
-        },
-        {
-          id: 'positions',
-          label: 'Positions',
-          icon: Briefcase,
-          path: '/positions',
-          permission: 'positions.view'
-        }
-      ]
-    },
-    {
-      id: 'leave',
-      label: 'Leave Management',
-      icon: Calendar,
-      isSection: true,
-      children: [
-        {
-          id: 'leave-requests',
-          label: 'Leave Requests',
-          icon: Calendar,
-          path: '/leave-requests',
-          permission: 'leave.view_all',
-          badge: '7'
-        },
-        {
-          id: 'leave-types',
-          label: 'Leave Types',
-          icon: Calendar,
-          path: '/leave-types',
-          permission: 'leavetypes.view'
-        }
-      ]
-    },
-    {
-      id: 'documents',
-      label: 'Documents',
-      icon: FileText,
-      path: '/documents',
-      permission: 'documents.view_all'
-    },
-    {
-      id: 'onboarding',
-      label: 'Onboarding',
-      icon: UserCheck,
-      isSection: true,
-      children: [
-        {
-          id: 'onboarding-tasks',
-          label: 'Tasks',
-          icon: UserCheck,
-          path: '/onboarding/tasks',
-          permission: 'onboardingtasks.view'
-        },
-        {
-          id: 'onboarding-templates',
-          label: 'Templates',
-          icon: FileText,
-          path: '/onboarding/templates',
-          permission: 'onboardingtemplates.view'
-        }
-      ]
-    },
-    {
-      id: 'payroll',
-      label: 'Payroll',
-      icon: DollarSign,
-      path: '/payroll',
-      permission: 'payroll.view',
-      badge: 'New'
-    },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      icon: BarChart3,
-      path: '/analytics',
-      permission: 'analytics.view'
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      isSection: true,
-      children: [
-        {
-          id: 'users',
-          label: 'Users',
-          icon: Users,
-          path: '/settings/users',
-          permission: 'users.view'
-        },
-        {
-          id: 'roles',
-          label: 'Roles',
-          icon: Shield,
-          path: '/settings/roles',
-          permission: 'roles.view'
-        },
-        {
-          id: 'system',
-          label: 'System',
-          icon: Settings,
-          path: '/settings/system',
-          permission: 'settings.edit'
-        }
-      ]
-    }
-  ];
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: Home,
+    path: '/dashboard',
+    permission: 'analytics.dashboard'
+  },
+  {
+    id: 'management',
+    label: 'Management',
+    icon: Users,
+    isSection: true,
+    children: [
+      {
+        id: 'employees',
+        label: 'Employees',
+        icon: Users,
+        path: '/dashboard/management/employees', 
+        permission: 'employees.view',
+        badge: '124'
+      },
+      {
+        id: 'departments',
+        label: 'Departments',
+        icon: Building2,
+        path: '/dashboard/management/departments',
+        permission: 'departments.view'
+      },
+      {
+        id: 'positions',
+        label: 'Positions',
+        icon: Briefcase,
+        path: '/dashboard/management/positions', 
+        permission: 'positions.view'
+      }
+    ]
+  },
+  {
+    id: 'leave',
+    label: 'Leave Management',
+    icon: Calendar,
+    isSection: true,
+    children: [
+      {
+        id: 'leave-requests',
+        label: 'Leave Requests',
+        icon: Calendar,
+        path: '/dashboard/leave-requests', 
+        permission: 'leave.view_all',
+        badge: '7'
+      },
+      {
+        id: 'leave-types',
+        label: 'Leave Types',
+        icon: Calendar,
+        path: '/dashboard/leave-types', 
+        permission: 'leavetypes.view'
+      }
+    ]
+  },
+  {
+    id: 'documents',
+    label: 'Documents',
+    icon: FileText,
+    path: '/dashboard/documents',
+    permission: 'documents.view_all'
+  },
+  {
+    id: 'onboarding',
+    label: 'Onboarding',
+    icon: UserCheck,
+    isSection: true,
+    children: [
+      {
+        id: 'onboarding-tasks',
+        label: 'Tasks',
+        icon: UserCheck,
+        path: '/dashboard/onboarding/tasks', 
+        permission: 'onboardingtasks.view'
+      },
+      {
+        id: 'onboarding-templates',
+        label: 'Templates',
+        icon: FileText,
+        path: '/dashboard/onboarding/templates',
+        permission: 'onboardingtemplates.view'
+      }
+    ]
+  },
+  {
+    id: 'payroll',
+    label: 'Payroll',
+    icon: DollarSign,
+    path: '/dashboard/payroll',
+    permission: 'payroll.view',
+    badge: 'New'
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    icon: BarChart3,
+    path: '/dashboard/analytics',
+    permission: 'analytics.view'
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
+    isSection: true,
+    children: [
+      {
+        id: 'users',
+        label: 'Users',
+        icon: Users,
+        path: '/dashboard/settings/users',
+        permission: 'users.view'
+      },
+      {
+        id: 'roles',
+        label: 'Roles',
+        icon: Shield,
+        path: '/dashboard/settings/roles',
+        permission: 'roles.view'
+      },
+      {
+        id: 'system',
+        label: 'System',
+        icon: Settings,
+        path: '/dashboard/settings/system',
+        permission: 'settings.edit'
+      }
+    ]
+  }
+];
 
   const renderNavItem = (item, depth = 0) => {
     if (item.permission && !hasPermission(item.permission)) {
@@ -218,32 +220,42 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
     }
 
     return (
-      <button
-        key={item.id}
-        onClick={() => onItemSelect && onItemSelect(item.id)}
-        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left hover:bg-gray-100 ${
-          activeItem === item.id ? 'bg-blue-50 border-r-4 border-blue-500' : ''
-        } ${depth > 0 ? 'ml-4' : ''}`}
-      >
-        <div className="flex items-center gap-3">
-          <item.icon 
-            size={20} 
-            className={activeItem === item.id ? 'text-blue-600' : 'text-gray-600'} 
-          />
-          <span className={`${activeItem === item.id ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>
-            {item.label}
-          </span>
-        </div>
-        {item.badge && (
-          <span className={`px-2 py-1 text-xs rounded-full ${
-            item.badge === 'New' 
-              ? 'bg-green-100 text-green-800' 
+      <NavLink
+  key={item.id}
+  to={item.path}
+  onClick={() => onItemSelect && onItemSelect(item.id)}
+  className={({ isActive }) =>
+    `w-full flex items-center justify-between px-3 py-2 rounded-lg text-left hover:bg-gray-100 ${
+      isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+    } ${depth > 0 ? 'ml-4' : ''}`
+  }
+>
+  {({ isActive }) => (
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center gap-3">
+        <item.icon
+          size={20}
+          className={isActive ? 'text-blue-600' : 'text-gray-600'}
+        />
+        <span className={isActive ? 'text-blue-700 font-medium' : 'text-gray-700'}>
+          {item.label}
+        </span>
+      </div>
+      {item.badge && (
+        <span
+          className={`px-2 py-1 text-xs rounded-full ${
+            item.badge === 'New'
+              ? 'bg-green-100 text-green-800'
               : 'bg-gray-100 text-gray-600'
-          }`}>
-            {item.badge}
-          </span>
-        )}
-      </button>
+          }`}
+        >
+          {item.badge}
+        </span>
+      )}
+    </div>
+  )}
+</NavLink>
+
     );
   };
 
