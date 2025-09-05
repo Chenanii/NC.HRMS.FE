@@ -28,6 +28,8 @@ export default function LoginPage() {
 
       localStorage.setItem("nc_hrms_token", requestResponse.result.token);
       localStorage.setItem("nc_hrms_permissions", JSON.stringify(requestResponse.result.permissions));
+      localStorage.setItem("nc_hrms_user", JSON.stringify(requestResponse.result.user));
+
       navigate("/dashboard");
       
     } catch (err) {

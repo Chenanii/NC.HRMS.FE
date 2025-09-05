@@ -82,3 +82,17 @@ export const resendConfirmationEmail = async (email) => {
 
   return response.json();
 };
+
+export const logout = async () => {
+  const token = localStorage.getItem("nc_hrms_token");
+
+  await axios.post(
+    `${API_BASE_URL}}/logout`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};

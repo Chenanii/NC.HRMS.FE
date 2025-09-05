@@ -21,7 +21,6 @@ const getPermissions = () => {
   try {
     
     const permissionsInfo = getUserPermissions();
-    console.log(permissionsInfo)
     return permissionsInfo || [];
   } catch {
     return [];

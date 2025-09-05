@@ -1,8 +1,17 @@
 const TOKEN_KEY = "nc_hrms_token";
 const PERMISSIONS_KEY = "nc_hrms_permissions";
 
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
-export const setToken = (token) => localStorage.setItem(TOKEN_KEY, token);
+export const getToken = () => {
+  const token = localStorage.getItem(TOKEN_KEY); // or however you store your token
+  
+  if (!token) {
+    return {};
+  }
+  
+  return {
+    'Authorization': `Bearer ${token}`
+  };
+};
 
 export const getUserPermissions = () => {
   try {
