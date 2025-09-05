@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { NavLink } from "react-router-dom";
-
 import { 
   Users, 
   Building2, 
@@ -61,7 +60,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
         id: 'employees',
         label: 'Employees',
         icon: Users,
-        path: '/dashboard/management/employees', 
+        path: 'management/employees', 
         permission: 'employees.view',
         badge: '124'
       },
@@ -69,14 +68,14 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
         id: 'departments',
         label: 'Departments',
         icon: Building2,
-        path: '/dashboard/management/departments',
+        path: 'management/departments',
         permission: 'departments.view'
       },
       {
         id: 'positions',
         label: 'Positions',
         icon: Briefcase,
-        path: '/dashboard/management/positions', 
+        path: 'management/positions', 
         permission: 'positions.view'
       }
     ]
