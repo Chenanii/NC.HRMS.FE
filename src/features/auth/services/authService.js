@@ -12,9 +12,11 @@ export const login = async (form) => {
 
     return response.data;
   } catch (error) {
+
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
+      error.response?.data?.requestResponse?.message ||
       "Login failed";
     throw new Error(message);
   }
