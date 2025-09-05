@@ -144,7 +144,7 @@ const Positions = () => {
         {hasPermission("positions.create") && (
           <button
             onClick={() => openModal()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition"
           >
             + Add Position
           </button>
@@ -157,7 +157,7 @@ const Positions = () => {
         placeholder="Search positions..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+        className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
       />
 
       {/* Table */}
@@ -199,7 +199,7 @@ const Positions = () => {
                       {hasPermission("positions.edit") && (
                         <button
                           onClick={() => openModal(pos)}
-                          className="px-3 py-1 text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
+                          className="px-3 py-1 text-green-600 border border-green-600 rounded hover:bg-green-600 hover:text-white transition"
                         >
                           Edit
                         </button>
@@ -250,18 +250,18 @@ const Positions = () => {
           placeholder="Title"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-green-500 outline-none"
         />
         <textarea
           placeholder="Description"
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-green-500 outline-none"
         />
         <select
           value={formData.departmentId}
           onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
-          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-green-500 outline-none"
         >
           <option value="">Select Department</option>
           {departments.map((d) => (
@@ -275,21 +275,21 @@ const Positions = () => {
           placeholder="Min Salary"
           value={formData.minSalary}
           onChange={(e) => setFormData({ ...formData, minSalary: e.target.value })}
-          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-green-500 outline-none"
         />
         <input
           type="number"
           placeholder="Max Salary"
           value={formData.maxSalary}
           onChange={(e) => setFormData({ ...formData, maxSalary: e.target.value })}
-          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-green-500 outline-none"
         />
         <label className="flex items-center space-x-2">
           <input
             type="checkbox"
             checked={formData.isActive}
             onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-            className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+            className="w-4 h-4 text-green-600 rounded focus:ring-2 focus:ring-green-500"
           />
           <span>Active</span>
         </label>
@@ -313,10 +313,10 @@ const Positions = () => {
           className={`px-4 py-2 rounded text-white transition ${
             editingPosition
               ? hasPermission("positions.edit")
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-green-600 hover:bg-green-700"
                 : "bg-gray-400 cursor-not-allowed"
               : hasPermission("positions.create")
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-green-600 hover:bg-green-700"
                 : "bg-gray-400 cursor-not-allowed"
           }`}
         >

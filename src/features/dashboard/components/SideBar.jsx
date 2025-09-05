@@ -224,7 +224,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
   onClick={() => onItemSelect && onItemSelect(item.id)}
   className={({ isActive }) =>
     `w-full flex items-center justify-between px-3 py-2 rounded-lg text-left hover:bg-gray-100 ${
-      isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+      isActive ? 'bg-green-50 border-r-4 border-green-500' : ''
     } ${depth > 0 ? 'ml-4' : ''}`
   }
 >
@@ -233,9 +233,9 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
       <div className="flex items-center gap-3">
         <item.icon
           size={20}
-          className={isActive ? 'text-blue-600' : 'text-gray-600'}
+          className={isActive ? 'text-green-600' : 'text-gray-600'}
         />
-        <span className={isActive ? 'text-blue-700 font-medium' : 'text-gray-700'}>
+        <span className={isActive ? 'text-green-700 font-medium' : 'text-gray-700'}>
           {item.label}
         </span>
       </div>

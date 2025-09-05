@@ -67,7 +67,7 @@ const TopBar = ({ onMenuToggle, isSidebarOpen }) => {
             onClick={() => setShowProfile(!showProfile)}
             className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100"
           >
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-medium">
               {user?.firstName ? user.firstName.charAt(0) : "?"}
             </div>
             <ChevronDown size={16} />
