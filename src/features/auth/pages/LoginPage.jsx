@@ -24,8 +24,12 @@ export default function LoginPage() {
     setError("");
     try {
       const data = await login(form);
-      localStorage.setItem("token", data.token);
+      let requestResponse = data.requestResponse;
+
+      localStorage.setItem("nc_hrms_token", requestResponse.result.token);
+      localStorage.setItem("nc_hrms_permissions", JSON.stringify(requestResponse.result.permissions));
       navigate("/dashboard");
+      
     } catch (err) {
       setError(err.message);
     } finally {
@@ -198,7 +202,7 @@ export default function LoginPage() {
                 {loading ? (
                   <span className="flex items-center justify-center text-sm">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Signing in...
+                    Please Wait...
                   </span>
                 ) : (
                   "Login"
