@@ -9,27 +9,20 @@ import {
   PlusCircle
 } from 'lucide-react';
 
-// Mock permissions - in real app this would come from auth context
-const mockPermissions = [
-  "users.view", "users.create", "users.edit", "users.delete", "users.invite",
-  "roles.view", "roles.create", "roles.edit", "roles.delete",
-  "employees.view", "employees.create", "employees.edit", "employees.delete", "employees.view_salary",
-  "departments.view", "departments.create", "departments.edit", "departments.delete",
-  "positions.view", "positions.create", "positions.edit", "positions.delete",
-  "leave.view_own", "leave.create", "leave.edit", "leave.view_team", "leave.approve", "leave.view_all",
-  "leavetypes.view", "leavetypes.create", "leavetypes.edit", "leavetypes.delete",
-  "documents.view_own", "documents.upload", "documents.view_all", "documents.manage",
-  "onboarding.view", "onboarding.manage", "onboarding.complete_tasks",
-  "onboardingtasks.view", "onboardingtasks.complete", "onboardingtasks.update", "onboardingtasks.reopen",
-  "onboardingtemplates.view", "onboardingtemplates.create", "onboardingtemplates.update", "onboardingtemplates.delete",
-  "payroll.view", "payroll.process", "payroll.reports",
-  "analytics.view", "analytics.export", "analytics.dashboard",
-  "settings.view", "settings.edit",
-  "tenants.view", "tenants.create", "tenants.edit", "tenants.delete"
-];
+const getPermissions = () => {
+  try {
+    
+    const permissionsInfo = getUserPermissions();
+    return permissionsInfo || [];
+  } catch {
+    return [];
+  }
+};
 
-// Permission checker utility
-const hasPermission = (permission) => mockPermissions.includes(permission);
+const hasPermission = (permission) => {
+  const permissions = getPermissions();
+  return permissions.includes(permission);
+};
 
 // Dashboard Stats Card Component
 const StatsCard = ({ icon: Icon, title, value, change, changeType }) => (
