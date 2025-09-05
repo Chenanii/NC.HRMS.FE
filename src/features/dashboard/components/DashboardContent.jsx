@@ -61,6 +61,28 @@ const QuickActions = () => {
     </div>
   );
 };
+// Dashboard Stats Card Component
+const StatsCard = ({ icon: Icon, title, value, change, changeType }) => (
+  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-600 mb-1">{title}</p>
+        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        {change && (
+          <p className={`text-sm mt-1 ${
+            changeType === 'positive' ? 'text-green-600' : 'text-red-600'
+          }`}>
+            {changeType === 'positive' ? '↗' : '↘'} {change}
+          </p>
+        )}
+      </div>
+      <div className="p-3 bg-blue-50 rounded-lg">
+        <Icon size={24} className="text-blue-600" />
+      </div>
+    </div>
+  </div>
+);
+
 // Recent Activity Component
 const RecentActivity = () => {
   const activities = [
