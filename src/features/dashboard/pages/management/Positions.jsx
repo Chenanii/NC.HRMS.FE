@@ -51,15 +51,30 @@ const fetchPositions = async () => {
 
   // Fetch departments for dropdown
   const fetchDepartments = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get("https://nthaka.com/hrms/api/auth/getalldepartments");
-      setDepartments(res.data);
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(
+        "https://nthaka.com/hrms/api/auth/positions/getalldepartments",
+        {
+          params: { page, pageSize, search },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setDepartments(res.data.items);
+      setTotal(res.data.total);
     } catch (err) {
       console.error("Failed to fetch departments:", err);
       alert("Failed to load departments.");
+    } finally {
+      setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchPositions();
     fetchDepartments();
