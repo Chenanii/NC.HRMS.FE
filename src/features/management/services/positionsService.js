@@ -3,7 +3,7 @@ import axios from "axios";
 const API_BASE = "https://nthaka.com/hrms/api/positions";
 const API_BASE_Department = "https://nthaka.com/hrms/api/departments";
 
-const getToken = () => localStorage.getItem("token");
+const getToken = () => localStorage.getItem("nc_hrms_token");
 
 export const fetchPositions = async () => {
   const token = getToken();
@@ -18,7 +18,7 @@ export const fetchDepartments = async () => {
   const res = await axios.get(`${API_BASE_Department}/getalldepartments`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  return res.data||[];
 };
 
 export const createPosition = async (data) => {
