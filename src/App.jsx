@@ -18,8 +18,13 @@ import Dashboard from './features/dashboard/pages/Dashboard';
 import UserListPage from './features/users/pages/UserListPage';
 import UserForm from './features/users/components/UserForm';
 
+
+//for toast notifications
+import { Toaster } from "react-hot-toast";
+
 function App() {
   return (
+    <>
     <Router>
       <Routes>
         {/* Public routes */}
@@ -82,6 +87,8 @@ function App() {
         </Route>
       </Routes>
     </Router>
+   <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+</>
   );
 }
 
