@@ -90,7 +90,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
         id: 'leave-requests',
         label: 'Leave Requests',
         icon: Calendar,
-        path: '/dashboard/leave-requests', 
+        path: '/dashboard/leave/leave-requests', 
         permission: 'leave.view_all',
         badge: '7'
       },
@@ -98,7 +98,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
         id: 'leave-types',
         label: 'Leave Types',
         icon: Calendar,
-        path: '/dashboard/leave-types', 
+        path: '/dashboard/leave/leave-types', 
         permission: 'leavetypes.view'
       }
     ]
