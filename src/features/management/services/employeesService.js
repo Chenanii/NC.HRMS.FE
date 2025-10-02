@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://nthaka.com/hrms/api/employees";
+const API_BASE = "https://nexa-circuit.com/hrms/api/employees";
 
 const getToken = () => localStorage.getItem("nc_hrms_token");
 

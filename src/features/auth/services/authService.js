@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://nthaka.com/hrms/api/Auth";
+const API_BASE_URL = "https://nexa-circuit.com/hrms/api/Auth";
 
 // Login request
 export const login = async (form) => {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://nthaka.com/hrms/api/leavetypes";
+const API_BASE = "https://nexa-circuit.com/hrms/api/leavetypes";
 
 const getToken = () => localStorage.getItem("nc_hrms_token");
 

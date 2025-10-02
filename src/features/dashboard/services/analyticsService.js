@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getToken } from "../../utilits/auth";
 
-const API_BASE = "https://nthaka.com/hrms/api/Analytics";
+const API_BASE = "https://nexa-circuit.com/hrms/api/Analytics";
 
 export const getEmployeeStatistics = async () => {
   const res = await axios.get(`${API_BASE}/employee-statistics`, {
