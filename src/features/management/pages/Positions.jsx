@@ -80,7 +80,8 @@ const Positions = () => {
     setLoading(true);
     try {
       const data = await fetchPositions();
-      const items = Array.isArray(data) ? data : data?.items || [];
+      const items = Array.isArray(data) ? data : data?.requestResponse.result || [];
+
       setPositions(items);
       setTotal(data?.total || items.length);
     } catch (err) {
@@ -135,27 +136,61 @@ const Positions = () => {
   const handleSubmit = async () => {
     try {
       if (editingPosition) {
-        if (!hasPermission("positions.edit")) return alert("You don't have permission to edit positions.");
-        await updatePosition(editingPosition.id, formData);
+        if (!hasPermission("positions.edit")) {
+          return alert("You don't have permission to edit positions.");
+        }
+
+        const updateData = {
+          title: formData.title,
+          description: formData.description || "",
+          departmentId: formData.departmentId || null,
+          minSalary: formData.minSalary || 0,
+          maxSalary: formData.maxSalary || 0,
+          isActive: formData.isActive,
+        };
+
+        await updatePosition(editingPosition.id, updateData);
+        alert("Position updated successfully!");
       } else {
-        if (!hasPermission("positions.create")) return alert("You don't have permission to create positions.");
-        await createPosition(formData);
+        if (!hasPermission("positions.create")) {
+          return alert("You don't have permission to create positions.");
+        }
+
+        const createData = {
+          title: formData.title,
+          description: formData.description || "",
+          departmentId: formData.departmentId || null,
+          minSalary: formData.minSalary || 0,
+          maxSalary: formData.maxSalary || 0,
+          isActive: formData.isActive,
+        };
+
+        await createPosition(createData);
+        alert("Position created successfully!");
       }
+
       loadPositions();
       setIsModalOpen(false);
     } catch (err) {
       console.error(err);
+      alert("An error occurred while saving the position.");
     }
-  };
+    };
 
   const handleDelete = async (id) => {
-    if (!hasPermission("positions.delete")) return alert("You don't have permission to delete positions.");
+    if (!hasPermission("positions.delete")) {
+      return alert("You don't have permission to delete positions.");
+    }
+
     if (!window.confirm("Are you sure you want to delete this position?")) return;
+
     try {
       await deletePosition(id);
+      alert("Position deleted successfully!");
       loadPositions();
     } catch (err) {
       console.error(err);
+      alert("Failed to delete the position.");
     }
   };
 
