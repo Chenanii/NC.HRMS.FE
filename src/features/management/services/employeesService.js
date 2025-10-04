@@ -9,8 +9,10 @@ export const fetchEmployees = async () => {
   const res = await axios.get(`${API_BASE}/getallemployees`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data || [];
+
+  return res.data.result || [];
 };
+
 
 export const createEmployee = async (data) => {
   const token = getToken();

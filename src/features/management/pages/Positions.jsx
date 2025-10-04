@@ -6,8 +6,8 @@ import {
   updatePosition,
   deletePosition,
 } from "../services/positionsService";
-
 import { getUserPermissions } from "../../utilits/auth";
+import Select from "react-select";
 
 // Icons
 const SearchIcon = () => (
@@ -453,18 +453,17 @@ const Positions = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Department
                 </label>
-                <select
-                  value={formData.departmentId || ""}
-                  onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200"
-                >
-                  <option value="">Select Department</option>
-                  {departments.map((d) => (
-                    <option key={d.value} value={d.value}>
-                      {d.label}
-                    </option>
-                  ))}
-                </select>
+              <Select
+                options={departments}
+                value={departments.find((d) => d.value === formData.departmentId) || null}
+                onChange={(selected) =>
+                  setFormData({ ...formData, departmentId: selected?.value || "" })
+                }
+                placeholder="Select Department"
+                isClearable
+                className="w-full"
+                classNamePrefix="react-select"
+              />
               </div>
             <div className="grid grid-cols-2 gap-4">
               {/* Min Salary */}
