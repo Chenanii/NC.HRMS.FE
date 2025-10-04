@@ -24,6 +24,7 @@ export const createEmployee = async (data) => {
 
 export const updateEmployee = async (id, data) => {
   const token = getToken();
+  console.log("Updating employee with ID:", id, "Data:", data);
   const res = await axios.put(`${API_BASE}/updateemployee/${id}`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });

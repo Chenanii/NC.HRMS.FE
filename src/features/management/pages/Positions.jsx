@@ -102,6 +102,13 @@ const Positions = () => {
       setDepartments([]);
     }
   };
+  
+ const formatAmount = (value) => {
+  if (value == null || value === "") return "0";
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+  }).format(Number(value));
+  };
 
   useEffect(() => {
     loadPositions();
@@ -286,8 +293,8 @@ const Positions = () => {
                             <td className="px-6 py-4 font-medium text-gray-900">{count}</td>
                             <td className="px-6 py-4 font-medium text-gray-900">{pos.title}</td>
                             <td className="px-6 py-4 text-gray-600">{pos.departmentName || "N/A"}</td>
-                            <td className="px-6 py-4 text-gray-600">{pos.minSalary}</td>
-                            <td className="px-6 py-4 text-gray-600">{pos.maxSalary}</td>
+                            <td className="px-6 py-4 text-gray-600">{formatAmount(pos.minSalary)}</td>
+                            <td className="px-6 py-4 text-gray-600">{formatAmount(pos.maxSalary)}</td>
                             <td className="px-6 py-4">
                               <span
                                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

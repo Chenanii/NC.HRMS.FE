@@ -50,12 +50,24 @@ const ChevronRightIcon = () => (
   </svg>
 );
 
+const formatAmount = (value) => {
+  if (value == null || value === "") return "0";
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+  }).format(Number(value));
+};
+
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [total, setTotal] = useState(0);
+
   const [viewingEmployee, setViewingEmployee] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -96,6 +108,7 @@ const Employees = () => {
     try {
       const data = await fetchEmployees();
       setEmployees(Array.isArray(data) ? data : []);
+      setTotal(data.length);
     } catch (err) {
       console.error(err);
       setEmployees([]);
@@ -596,8 +609,13 @@ const Employees = () => {
 {hasPermission("employees.view") ? (
   <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
     {loading ? (
-      <div className="flex items-center justify-center py-12">Loading employees...</div>
-    ) : (
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+          <p className="text-gray-500 mt-2">Loading employees...</p>
+        </div>
+      </div> 
+       ) : (
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-50 text-gray-700 uppercase text-xs font-medium">
@@ -614,9 +632,11 @@ const Employees = () => {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {filteredEmployees.length ? (
-              filteredEmployees.map((emp) => (
+              filteredEmployees.map((emp, index) => {
+                const count = (page - 1) * pageSize + index + 1;
+                return(
                 <tr key={emp.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-mono text-xs">{emp.employeeNumber}</td>
+                  <td className="px-6 py-4 font-mono text-xs">{count}</td>
                   <td className="px-6 py-4 font-medium">{emp.fullName || `${emp.firstName} ${emp.lastName}`}</td>
                   <td className="px-6 py-4">{emp.email}</td>
                   <td className="px-6 py-4">{emp.phoneNumber || "N/A"}</td>
@@ -629,7 +649,7 @@ const Employees = () => {
                     </span>
                   </td>
                   {hasPermission("employees.view_salary") && (
-                    <td className="px-6 py-4">{emp.baseSalary ? `${emp.baseSalary.toLocaleString()}` : "N/A"}</td>
+                    <td className="px-6 py-4">{emp.baseSalary ? `${formatAmount(emp.baseSalary)}` : "N/A"}</td>
                   )}
                   <td className="px-6 py-4 flex space-x-2">
                     {hasPermission("employees.view") && (
@@ -649,7 +669,7 @@ const Employees = () => {
                     )}
                   </td>
                 </tr>
-              ))
+              )})
             ) : (
               <tr>
                 <td colSpan="9" className="px-6 py-12 text-center text-gray-500">

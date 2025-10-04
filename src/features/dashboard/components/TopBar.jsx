@@ -1,24 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, Search, Menu, X, ChevronDown } from 'lucide-react';
-import { logout } from '../../auth/services/authService';
+import React, { useState, useEffect } from "react";
+import { Bell, Search, Menu, X, ChevronDown } from "lucide-react";
+import { logout } from "../../auth/services/authService";
+import { jwtDecode }from "jwt-decode";
 
 const TopBar = ({ onMenuToggle, isSidebarOpen }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [user, setUser] = useState(null);
 
+  // 🔑 Check token validity and auto-logout
   useEffect(() => {
     const storedUser = localStorage.getItem("nc_hrms_user");
+    const token = localStorage.getItem("nc_hrms_token");
+
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const now = Date.now() / 1000;
+
+        if (decoded.exp && decoded.exp < now) {
+          // Token already expired
+          handleLogout();
+        } else if (decoded.exp) {
+          // Auto logout when token expires
+          const timeout = (decoded.exp - now) * 1000;
+          const timer = setTimeout(() => {
+            handleLogout();
+          }, timeout);
+
+          return () => clearTimeout(timer);
+        }
+      } catch (error) {
+        console.error("Invalid token:", error);
+        handleLogout();
+      }
+    }
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      localStorage.clear();
+      window.location.href = "/login";
+    }
+  };
 
   return (
     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
       {/* Left side */}
       <div className="flex items-center gap-4">
-        <button onClick={onMenuToggle} className="lg:hidden p-2 rounded-lg hover:bg-gray-100">
+        <button
+          onClick={onMenuToggle}
+          className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+        >
           {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
 
@@ -51,10 +92,11 @@ const TopBar = ({ onMenuToggle, isSidebarOpen }) => {
                 <h3 className="font-semibold">Notifications</h3>
               </div>
               <div className="max-h-96 overflow-y-auto">
-                {/* Dummy notifications */}
                 <div className="p-3 hover:bg-gray-50 border-b">
                   <p className="text-sm font-medium">New leave request</p>
-                  <p className="text-xs text-gray-500">John Doe requested 3 days leave</p>
+                  <p className="text-xs text-gray-500">
+                    John Doe requested 3 days leave
+                  </p>
                 </div>
               </div>
             </div>
@@ -76,24 +118,23 @@ const TopBar = ({ onMenuToggle, isSidebarOpen }) => {
           {showProfile && (
             <div className="absolute right-0 top-12 bg-white border rounded-lg shadow-lg w-48 z-50">
               <div className="p-3 border-b">
-                <p className="font-medium">{user?.firstName || "fistname"} {user?.lastName || "lastname"}</p>
-                <p className="text-sm text-gray-500">{user?.email || "email@example.com"}</p>
+                <p className="font-medium">
+                  {user?.firstName || "firstname"} {user?.lastName || "lastname"}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {user?.email || "email@example.com"}
+                </p>
               </div>
               <div className="py-2">
-                <button className="w-full text-left px-3 py-2 hover:bg-gray-50">Profile</button>
-                <button className="w-full text-left px-3 py-2 hover:bg-gray-50">Settings</button>
+                <button className="w-full text-left px-3 py-2 hover:bg-gray-50">
+                  Profile
+                </button>
+                <button className="w-full text-left px-3 py-2 hover:bg-gray-50">
+                  Settings
+                </button>
                 <button
                   className="w-full text-left px-3 py-2 hover:bg-gray-50 text-red-600"
-                  onClick={async () => {
-                    try {
-                      await logout(); 
-                    } catch (error) {
-                      console.error("Logout failed:", error);
-                    } finally {
-                      localStorage.clear();
-                      window.location.href = "/login";
-                    }
-                  }}
+                  onClick={handleLogout}
                 >
                   Logout
                 </button>
