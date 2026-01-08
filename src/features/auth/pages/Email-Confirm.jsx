@@ -22,7 +22,7 @@ const EmailConfirmPage = () => {
           return;
         }
 
-        const API_BASE_URL = "https://nexa-circuit.com/hrms/api/Auth";
+        const API_BASE_URL = "https://nexacircuit-hrms.com/api/Auth";
 
         // API call for email confirmation
         const response = await fetch(`${API_BASE_URL}/confirm-email`, {

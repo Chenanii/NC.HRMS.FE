@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://nexa-circuit.com/hrms/api/LeaveType";
+const API_BASE = "https://nexacircuit-hrms.com/api/LeaveType";
 
 
 
