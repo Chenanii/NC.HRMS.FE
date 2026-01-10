@@ -21,8 +21,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/nexacircuit-hrms-frontend:latest -f ./Dockerfile .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/nexacircuit-hrms-frontend:latest -f ./Dockerfile .
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/nexacircuit-hrms-frontend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/nexacircuit-hrms-frontend:latest
