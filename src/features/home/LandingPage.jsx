@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ChevronDown, Star, Users, Shield, Zap, ArrowUp, Menu, X, Play, Check } from "lucide-react";
+import { ChevronDown, Users, Shield, Zap, ArrowUp, Menu,
+   X, Play, Check, Cog, Network, CloudLightning,
+   CreditCard, BriefcaseBusiness, BarChart3, Link2,  
+   TreeDeciduousIcon} from "lucide-react";
 import logo from "../../assets/images/logo.png";
 import logowhite from "../../assets/images/logo-white.png";
 import { Link, useLocation  } from "react-router-dom";
@@ -221,7 +224,7 @@ export default function EnhancedNcHrmsLanding() {
               </motion.span>
 
               <motion.h4
-                className="mt-2 text-4xl md:text-6xl font-extrabold leading-tight bg-gradient-to-r from-slate-900 via-green-700 to-blue-700 bg-clip-text text-transparent"
+                className="mt-2 text-4xl md:text-6xl font-extrabold leading-tight bg-green-900 bg-clip-text text-transparent"
                 variants={itemVariants}
               >
                 Streamline your people operations with NC.HRMS
@@ -422,13 +425,42 @@ export default function EnhancedNcHrmsLanding() {
             viewport={{ once: true }}
           >
             {[
-              { title: 'Employee Management', desc: 'Central employee directory, profiles & documents', icon: <Users className="w-8 h-8" />, color: 'from-blue-500 to-blue-600' },
-              { title: 'Payroll & Benefits', desc: 'Automated payroll runs, taxes & benefit management', icon: '💳', color: 'from-green-500 to-green-600' },
-              { title: 'Leave Management', desc: 'Requests, approvals and accruals', icon: '🌴', color: 'from-purple-500 to-purple-600' },
-              { title: 'Recruitment', desc: 'Job boards, applicants & interview scheduling', icon: '🧭', color: 'from-indigo-500 to-indigo-600' },
-              { title: 'Analytics', desc: 'People analytics, retention & headcount trends', icon: '📊', color: 'from-teal-500 to-teal-600' },
-              { title: 'Integrations', desc: 'APIs, SSO, accounting & calendar sync', icon: '🔗', color: 'from-cyan-500 to-cyan-600' }
-            ].map((s, i) => (
+              { 
+                title: 'Employee Management', 
+                desc: 'Central employee directory, profiles & documents', 
+                icon: <Users className="w-8 h-8" />, 
+                color: 'from-blue-500 to-blue-600' 
+              },
+              { 
+                title: 'Payroll & Benefits', 
+                desc: 'Automated payroll runs, taxes & benefit management', 
+                icon: <CreditCard className="w-8 h-8" />, 
+                color: 'from-green-500 to-green-600' 
+              },
+              { 
+                title: 'Leave Management', 
+                desc: 'Requests, approvals and accruals', 
+                icon: <TreeDeciduousIcon className="w-8 h-8" />, 
+                color: 'from-purple-500 to-purple-600' 
+              },
+              { 
+                title: 'Recruitment', 
+                desc: 'Job boards, applicants & interview scheduling', 
+                icon: <BriefcaseBusiness className="w-8 h-8" />, 
+                color: 'from-indigo-500 to-indigo-600' 
+              },
+              { 
+                title: 'Analytics', 
+                desc: 'People analytics, retention & headcount trends', 
+                icon: <BarChart3 className="w-8 h-8" />, 
+                color: 'from-teal-500 to-teal-600' 
+              },
+              { 
+                title: 'Integrations', 
+                desc: 'APIs, SSO, accounting & calendar sync', 
+                icon: <Link2 className="w-8 h-8" />, 
+                color: 'from-cyan-500 to-cyan-600' 
+              }].map((s, i) => (
               <motion.div 
                 key={s.title} 
                 className="group bg-white p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-300 hover:border-green-200"
@@ -480,7 +512,7 @@ export default function EnhancedNcHrmsLanding() {
                     ease: "easeInOut"
                   }}
                 >
-                  ⚡
+                  <CloudLightning className="w-12 h-12" />
                 </motion.div>
               </div>
             </motion.div>
@@ -492,18 +524,18 @@ export default function EnhancedNcHrmsLanding() {
               viewport={{ once: true }}
             >
               <span className="text-sm text-green-700 uppercase font-semibold tracking-wider">Focused on people</span>
-              <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-slate-900 to-green-700 bg-clip-text text-transparent">
+              <h2 className="text-3xl md:text-4xl font-bold mt-4 bg-gradient-to-r from-slate-900 to-green-700 bg-clip-text text-transparent">
                 Our approach to HR - modern, secure, human
               </h2>
-              <p className="mt-6 text-lg text-slate-600 leading-relaxed">
+              <p className="mt-4 text-sm text-slate-600 leading-relaxed">
                 Our HRMS is built to reduce manual HR work and help people teams do more strategic work: hiring, developing and retaining talent.
               </p>
 
               <div className="mt-8 space-y-6">
                 {[
                   { icon: <Check className="w-6 h-6" />, title: "Secure & Compliant", desc: "GDPR-ready data handling and role-based access control." },
-                  { icon: "⚙️", title: "Highly Customizable", desc: "Configure workflows, approval chains and custom fields to match your processes." },
-                  { icon: "📡", title: "Real-time Insights", desc: "People analytics and exportable reports for leadership." }
+                  { icon: <Cog className="w-6 h-6" />, title: "Highly Customizable", desc: "Configure workflows, approval chains and custom fields to match your processes." },
+                  { icon: <Network className="w-6 h-6" />, title: "Real-time Insights", desc: "People analytics and exportable reports for leadership." }
                 ].map((feature, i) => (
                   <motion.div 
                     key={i}
@@ -782,7 +814,7 @@ export default function EnhancedNcHrmsLanding() {
 
         {/* CTA Section */}
         <motion.section 
-          className="py-20 bg-gradient-to-br from-green-600 via-green-700 to-blue-700 text-white relative overflow-hidden"
+          className="py-20 bg-gradient-to-br from-green-600 via-green-900 to-blue-700 text-white relative overflow-hidden"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
