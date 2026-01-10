@@ -1,0 +1,8 @@
+
+services:
+  nexacircuit-hrms-fe:
+    image: chenanii/nexacircuit-hrms-frontend:latest
+    container_name: nexacircuit-hrms-fe
+    ports:
+      - "3000:80"
+    restart: unless-stopped
