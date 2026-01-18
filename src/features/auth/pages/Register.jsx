@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Eye, EyeOff, Building, User, Mail, Briefcase, Globe, Check, X, Loader2, ChevronRight, ChevronLeft } from 'lucide-react';
-import { registerUser } from "../services/authService"; 
+import { registerUser, registerWithGoogle } from "../services/authService"; 
 import { checkSubdomainAvailability } from "../services/authService"; 
 
 const RegistrationForm = () => {
@@ -18,17 +18,108 @@ const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [isGoogleSignUp, setIsGoogleSignUp] = useState(false);
+  const [googleCredential, setGoogleCredential] = useState(null);
   const [subdomainCheck, setSubdomainCheck] = useState({
     isChecking: false,
     isAvailable: null,
     lastChecked: ''
   });
+  const googleButtonRef = useRef(null);
 
   const steps = [
     { id: 1, title: 'Personal Info', fields: ['firstName', 'lastName', 'email'] },
     { id: 2, title: 'Company Setup', fields: ['companyName', 'subdomain', 'jobTitle'] },
     { id: 3, title: 'Security', fields: ['password'] }
   ];
+
+  // Decode Google JWT to extract user info
+  const decodeGoogleJWT = (credential) => {
+    try {
+      const base64Url = credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error('Error decoding Google JWT:', error);
+      return null;
+    }
+  };
+
+  const handleGoogleSignUp = useCallback(async (credential) => {
+    setGoogleLoading(true);
+    setFeedback({ type: "", message: "" });
+    
+    try {
+      // Decode JWT to get user info
+      const decodedToken = decodeGoogleJWT(credential);
+      
+      if (decodedToken) {
+        // Extract name from Google token
+        const fullName = decodedToken.name || '';
+        const nameParts = fullName.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        // Pre-fill form with Google data
+        setFormData(prev => ({
+          ...prev,
+          email: decodedToken.email || prev.email,
+          firstName: firstName || prev.firstName,
+          lastName: lastName || prev.lastName,
+        }));
+        
+        setGoogleCredential(credential);
+        setIsGoogleSignUp(true);
+        
+        // Skip to company setup step if personal info is filled
+        if (firstName && decodedToken.email) {
+          setCurrentStep(2);
+        }
+      }
+    } catch (error) {
+      setFeedback({ type: "error", message: "Failed to process Google account. Please try again." });
+    } finally {
+      setGoogleLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Load Google Identity Services script
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.google && googleButtonRef.current) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
+          callback: handleGoogleSignUp,
+        });
+
+        window.google.accounts.id.renderButton(
+          googleButtonRef.current,
+          {
+            theme: "outline",
+            size: "large",
+            width: "100%",
+            text: "signup_with",
+            locale: "en",
+          }
+        );
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, [handleGoogleSignUp]);
 
   const debouncedCheckSubdomain = useCallback(
     (() => {
@@ -76,8 +167,11 @@ const RegistrationForm = () => {
         if (!formData.email.trim()) newErrors.email = 'Email is required';
         else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email';
       } else if (field === 'password') {
-        if (!formData.password.trim()) newErrors.password = 'Password is required';
-        else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+        // Skip password validation if using Google sign-up
+        if (!isGoogleSignUp) {
+          if (!formData.password.trim()) newErrors.password = 'Password is required';
+          else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+        }
       } else if (field === 'firstName') {
         if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
       } else if (field === 'lastName') {
@@ -135,7 +229,21 @@ const RegistrationForm = () => {
     setFeedback({ type: "", message: "" });
 
     try {
-      const result = await registerUser(formData);
+      let result;
+      
+      if (isGoogleSignUp && googleCredential) {
+        // Register with Google (skip password validation for Google sign-up)
+        const companyData = {
+          companyName: formData.companyName,
+          subdomain: formData.subdomain,
+          jobTitle: formData.jobTitle,
+        };
+        result = await registerWithGoogle(googleCredential, companyData);
+      } else {
+        // Regular registration
+        result = await registerUser(formData);
+      }
+      
       setFeedback({ type: "success", message: "Registration successful!" });
 
       const response = result?.data || {};
@@ -355,6 +463,23 @@ const RegistrationForm = () => {
         );
 
       case 3:
+        // Skip password step if using Google sign-up
+        if (isGoogleSignUp) {
+          return (
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700">
+                <div className="flex items-center">
+                  <Check className="w-5 h-5 mr-2 text-green-600" />
+                  <p>You're signing up with Google. No password needed!</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 text-center">
+                Review your information and click "Create Account" to complete registration.
+              </p>
+            </div>
+          );
+        }
+        
         return (
           <div className="space-y-4">
             <div>
@@ -495,8 +620,31 @@ const RegistrationForm = () => {
               <User className="w-8 h-8 text-white"/>
             </div>
             <h1 className="text-xl font-bold text-gray-900 mb-1">Create Your Account</h1>
-            <p className="text-sm text-gray-600">Step {currentStep} of {steps.length}</p>
+            <p className="text-sm text-gray-600">Step {currentStep} of {isGoogleSignUp ? steps.length - 1 : steps.length}</p>
           </div>
+
+          {/* Google Sign-Up Button - Show only on first step if not already using Google */}
+          {currentStep === 1 && !isGoogleSignUp && (
+            <div className="px-6 pb-4">
+              <div ref={googleButtonRef} className="w-full flex justify-center mb-4"></div>
+              {googleLoading && (
+                <div className="text-center mb-2">
+                  <span className="flex items-center justify-center text-sm text-gray-600">
+                    <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Processing Google account...
+                  </span>
+                </div>
+              )}
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-3 bg-white text-gray-500">or continue with email</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Progress Bar */}
           <div className="px-6 pb-4">
@@ -564,7 +712,7 @@ const RegistrationForm = () => {
                 Back
               </button>
 
-              {currentStep < steps.length ? (
+              {currentStep < (isGoogleSignUp ? steps.length - 1 : steps.length) ? (
                 <button
                   type="button"
                   onClick={handleNext}

@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Mail, Lock, Eye, EyeOff, Building, User, Globe } from "lucide-react";
-import { login } from "../services/authService";
+import { login, loginWithGoogle } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "", remember: false });
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const googleButtonRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -38,6 +40,60 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const handleGoogleLogin = useCallback(async (credential) => {
+    setGoogleLoading(true);
+    setError("");
+    try {
+      const data = await loginWithGoogle(credential);
+      let requestResponse = data.requestResponse;
+
+      localStorage.setItem("nc_hrms_token", requestResponse.result.token);
+      localStorage.setItem("nc_hrms_permissions", JSON.stringify(requestResponse.result.permissions));
+      localStorage.setItem("nc_hrms_user", JSON.stringify(requestResponse.result.user));
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setGoogleLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    // Load Google Identity Services script
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.google && googleButtonRef.current) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "", // You'll need to set this in your .env file
+          callback: handleGoogleLogin,
+        });
+
+        window.google.accounts.id.renderButton(
+          googleButtonRef.current,
+          {
+            theme: "outline",
+            size: "large",
+            width: "100%",
+            text: "signin_with",
+            locale: "en",
+          }
+        );
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, [handleGoogleLogin]);
 
   return (
     <div className="min-h-screen relative bg-gradient-to-br from-blue-50 via-indigo-50 to-green-100 flex items-center justify-center p-4 overflow-hidden">
@@ -220,6 +276,18 @@ export default function LoginPage() {
             <div className="relative flex justify-center text-xs">
               <span className="px-3 bg-white text-gray-500">or</span>
             </div>
+          </div>
+          {/* Google Login Button */}
+          <div className="mb-4">
+            <div ref={googleButtonRef} className="w-full flex justify-center"></div>
+            {googleLoading && (
+              <div className="mt-2 text-center">
+                <span className="flex items-center justify-center text-sm text-gray-600">
+                  <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Signing in with Google...
+                </span>
+              </div>
+            )}
           </div>
           {/* Register link */}
           <p className="text-center text-xs text-gray-600 mt-6">

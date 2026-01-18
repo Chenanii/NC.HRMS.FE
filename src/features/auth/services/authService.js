@@ -96,3 +96,40 @@ export const logout = async () => {
     }
   );
 };
+
+// Google OAuth login
+export const loginWithGoogle = async (credential) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/google-login`, {
+      credential: credential,
+    });
+
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.response?.data?.requestResponse?.message ||
+      "Google login failed";
+    throw new Error(message);
+  }
+};
+
+// Google OAuth registration
+export const registerWithGoogle = async (credential, companyData) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/google-register`, {
+      credential: credential,
+      ...companyData,
+    });
+
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.response?.data?.requestResponse?.message ||
+      "Google registration failed";
+    throw new Error(message);
+  }
+};
