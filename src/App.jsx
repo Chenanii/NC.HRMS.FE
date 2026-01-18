@@ -12,6 +12,7 @@ import LeaveTypes from './features/leave/pages/leave-types';
 import LeaveRequests from './features/leave/pages/leave-requests';
 import RequestLeave from './features/leave/pages/request-leave';
 
+
 import DashboardContent from './features/dashboard/components/DashboardContent';
 import './index.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
