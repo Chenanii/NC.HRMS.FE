@@ -97,18 +97,18 @@ export const logout = async () => {
   );
 };
 
-// Google OAuth login
 export const loginWithGoogle = async (credential) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/login/google`,
-      { Credential: credential },
+      { Credential: credential },  // ✅ Capital C to match the DTO
       { headers: { "Content-Type": "application/json" } }
     );
     
     console.log("Google login response:", response);
     return response.data;
   } catch (error) {
+    console.error("Full error response:", error.response?.data); // Add this for debugging
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
