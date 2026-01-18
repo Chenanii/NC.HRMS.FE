@@ -2,7 +2,7 @@ const TOKEN_KEY = "nc_hrms_token";
 const PERMISSIONS_KEY = "nc_hrms_permissions";
 
 export const getToken = () => {
-  const token = localStorage.getItem(TOKEN_KEY); // or however you store your token
+  const token = localStorage.getItem(TOKEN_KEY); 
   
   if (!token) {
     return {};

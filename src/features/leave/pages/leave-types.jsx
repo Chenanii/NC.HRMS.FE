@@ -5,8 +5,10 @@ import {
   updateLeaveType,
   deleteLeaveType,
 } from "../services/leaveTypesService";
+
 import { getUserPermissions } from "../../utilits/auth";
 
+import { Check, X, Plus, Pencil, Trash2, AlertCircle } from "lucide-react";
 
 // Permission helpers
 const getPermissions = () => {
@@ -123,9 +125,12 @@ const LeaveTypes = () => {
   // View permission check
   if (!hasPermission("leavetypes.view")) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md mx-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Denied</h3>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md mx-4 border border-gray-100">
+          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h3>
           <p className="text-gray-600">You do not have permission to view leave types.</p>
         </div>
       </div>
@@ -133,276 +138,349 @@ const LeaveTypes = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Leave Types</h1>
-        {hasPermission("leavetypes.create") && (
-          <button
-            onClick={() => openModal()}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            Add Leave Type
-          </button>
-        )}
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-1">Leave Types</h1>
+            <p className="text-gray-600">Manage leave categories and their configurations</p>
+          </div>
+          {hasPermission("leavetypes.create") && (
+            <button
+              onClick={() => openModal()}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Add Leave Type
+            </button>
+          )}
+        </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        {loading ? (
-          <div className="p-6 text-center">Loading...</div>
-        ) : (
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Description</th>
-                <th className="px-4 py-2">Days/Year</th>
-                <th className="px-4 py-2">Consecutive Max</th>
-                <th className="px-4 py-2">Manager Approval</th>
-                <th className="px-4 py-2">HR Approval</th>
-                <th className="px-4 py-2">Paid</th>
-                <th className="px-4 py-2">Carry Forward</th>
-                <th className="px-4 py-2">Active</th>
-                <th className="px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaveTypes.length ? (
-                leaveTypes.map((type) => (
-                  <tr key={type.id} className="border-b">
-                    <td className="px-4 py-2">{type.name}</td>
-                    <td className="px-4 py-2">{type.description}</td>
-                    <td className="px-4 py-2">{type.defaultDaysPerYear}</td>
-                    <td className="px-4 py-2">{type.maxConsecutiveDays}</td>
-                    <td className="px-4 py-2">{type.requireManagerApproval ? "Yes" : "No"}</td>
-                    <td className="px-4 py-2">{type.requireHRApproval ? "Yes" : "No"}</td>
-                    <td className="px-4 py-2">{type.isPaid ? "Yes" : "No"}</td>
-                    <td className="px-4 py-2">
-                      {type.isCarryForward ? `Yes (${type.maxCarryForwardDays})` : "No"}
-                    </td>
-                    <td className="px-4 py-2">{type.isActive ? "Active" : "Inactive"}</td>
-                    <td className="px-4 py-2 space-x-2">
-                      {hasPermission("leavetypes.edit") && (
-                        <button
-                          onClick={() => openModal(type)}
-                          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {hasPermission("leavetypes.delete") && (
-                        <button
-                          onClick={() => handleDelete(type.id)}
-                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
+        {/* Table Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          {loading ? (
+            <div className="p-12 text-center">
+              <div className="inline-block w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+              <p className="mt-4 text-gray-600">Loading leave types...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Days/Year</th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Max Days</th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Approvals</th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="10" className="px-4 py-6 text-center text-gray-500">
-                    No leave types found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        )}
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {leaveTypes.length ? (
+                    leaveTypes.map((type) => (
+                      <tr key={type.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="font-semibold text-gray-900">{type.name}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-600 max-w-xs truncate">{type.description}</div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-flex items-center justify-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                            {type.defaultDaysPerYear}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-flex items-center justify-center px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                            {type.maxConsecutiveDays}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2 justify-center">
+                            {type.requireManagerApproval && (
+                              <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded text-xs font-medium">Manager</span>
+                            )}
+                            {type.requireHRApproval && (
+                              <span className="px-2 py-1 bg-orange-50 text-orange-700 rounded text-xs font-medium">HR</span>
+                            )}
+                            {!type.requireManagerApproval && !type.requireHRApproval && (
+                              <span className="text-gray-400 text-xs">None</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2 justify-center">
+                            {type.isPaid && (
+                              <span className="px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium">Paid</span>
+                            )}
+                            {type.isCarryForward && (
+                              <span className="px-2 py-1 bg-indigo-50 text-indigo-700 rounded text-xs font-medium">
+                                CF: {type.maxCarryForwardDays}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          {type.isActive ? (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
+                              <Check className="w-3 h-3" />
+                              Active
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                              <X className="w-3 h-3" />
+                              Inactive
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2 justify-center">
+                            {hasPermission("leavetypes.edit") && (
+                              <button
+                                onClick={() => openModal(type)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                            )}
+                            {hasPermission("leavetypes.delete") && (
+                              <button
+                                onClick={() => handleDelete(type.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="8" className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center">
+                          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <AlertCircle className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <p className="text-gray-600 font-medium">No leave types found</p>
+                          <p className="text-gray-400 text-sm mt-1">Get started by creating your first leave type</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal */}
       {isModalOpen && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50">
-        <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-fadeIn">
-          
-          {/* Header */}
-          <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-800">
-              {editingLeaveType ? "Edit Leave Type" : "Add Leave Type"}
-            </h2>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="text-gray-500 hover:text-gray-800 transition"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Body */}
-          <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
-            
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Leave Type Name
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
-              />
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex justify-between items-center px-8 py-6 border-b bg-gradient-to-r from-gray-50 to-gray-100">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {editingLeaveType ? "Edit Leave Type" : "Create Leave Type"}
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-200 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
-                rows={3}
-              />
-            </div>
-
-            {/* Numbers Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Body */}
+            <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+              {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Default Days Per Year
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Leave Type Name <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="number"
-                  value={formData.defaultDaysPerYear}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      defaultDaysPerYear: parseInt(e.target.value, 10) || 0,
-                    })
-                  }
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                  placeholder="e.g., Annual Leave"
                 />
               </div>
+
+              {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max Consecutive Days
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Description
                 </label>
-                <input
-                  type="number"
-                  value={formData.maxConsecutiveDays}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      maxConsecutiveDays: parseInt(e.target.value, 10) || 0,
-                    })
-                  }
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none resize-none"
+                  rows={3}
+                  placeholder="Brief description of this leave type"
                 />
+              </div>
+
+              {/* Numbers Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Default Days Per Year
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.defaultDaysPerYear}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        defaultDaysPerYear: parseInt(e.target.value, 10) || 0,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Max Consecutive Days
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.maxConsecutiveDays}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        maxConsecutiveDays: parseInt(e.target.value, 10) || 0,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              {/* Toggles Section */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-900 text-base">Configuration</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.requireManagerApproval}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          requireManagerApproval: e.target.checked,
+                        })
+                      }
+                      className="w-5 h-5 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <span className="font-medium text-gray-700">Require Manager Approval</span>
+                  </label>
+
+                  <label className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.requireHRApproval}
+                      onChange={(e) =>
+                        setFormData({ ...formData, requireHRApproval: e.target.checked })
+                      }
+                      className="w-5 h-5 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <span className="font-medium text-gray-700">Require HR Approval</span>
+                  </label>
+
+                  <label className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.isPaid}
+                      onChange={(e) =>
+                        setFormData({ ...formData, isPaid: e.target.checked })
+                      }
+                      className="w-5 h-5 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <span className="font-medium text-gray-700">Paid Leave</span>
+                  </label>
+
+                  <label className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.isCarryForward}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          isCarryForward: e.target.checked,
+                        })
+                      }
+                      className="w-5 h-5 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <span className="font-medium text-gray-700">Allow Carry Forward</span>
+                  </label>
+                </div>
+              </div>
+
+              {formData.isCarryForward && (
+                <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-200">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Max Carry Forward Days
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.maxCarryForwardDays}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        maxCarryForwardDays: parseInt(e.target.value, 10) || 0,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-indigo-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                    min="0"
+                  />
+                </div>
+              )}
+
+              <div className="pt-4 border-t">
+                <label className="flex items-center space-x-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) =>
+                      setFormData({ ...formData, isActive: e.target.checked })
+                    }
+                    className="w-5 h-5 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500"
+                  />
+                  <span className="font-medium text-gray-700">Active Status</span>
+                </label>
               </div>
             </div>
 
-            {/* Toggles */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.requireManagerApproval}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      requireManagerApproval: e.target.checked,
-                    })
-                  }
-                />
-                <span>Require Manager Approval</span>
-              </label>
-
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.requireHRApproval}
-                  onChange={(e) =>
-                    setFormData({ ...formData, requireHRApproval: e.target.checked })
-                  }
-                />
-                <span>Require HR Approval</span>
-              </label>
-
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isPaid}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isPaid: e.target.checked })
-                  }
-                />
-                <span>Paid Leave</span>
-              </label>
-
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isCarryForward}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      isCarryForward: e.target.checked,
-                    })
-                  }
-                />
-                <span>Carry Forward</span>
-              </label>
+            {/* Footer */}
+            <div className="flex justify-end gap-3 px-8 py-6 border-t bg-gray-50">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-6 py-2.5 rounded-xl border border-gray-300 hover:bg-white transition-all font-medium text-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!formData.name.trim()}
+                className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none font-medium"
+              >
+                {editingLeaveType ? "Update Leave Type" : "Create Leave Type"}
+              </button>
             </div>
-
-            {formData.isCarryForward && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max Carry Forward Days
-                </label>
-                <input
-                  type="number"
-                  value={formData.maxCarryForwardDays}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      maxCarryForwardDays: parseInt(e.target.value, 10) || 0,
-                    })
-                  }
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
-                />
-              </div>
-            )}
-
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={(e) =>
-                  setFormData({ ...formData, isActive: e.target.checked })
-                }
-              />
-              <span>Active</span>
-            </label>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!formData.name.trim()}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
-            >
-              {editingLeaveType ? "Update" : "Create"}
-            </button>
           </div>
         </div>
-      </div>
-    )}
-
+      )}
     </div>
   );
 };

@@ -100,7 +100,13 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
         icon: Calendar,
         path: '/dashboard/leave/leave-types', 
         permission: 'leavetypes.view'
-      }
+      },
+      {
+        id: 'request-leave',
+        label: 'Request Leave',
+        icon: Calendar,
+        path: '/dashboard/leave/request-leave',
+      },
     ]
   },
   {
