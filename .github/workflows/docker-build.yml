@@ -21,9 +21,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build 
+          docker build \
             --build-arg VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/nexacircuit-hrms-frontend:latest 
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/nexacircuit-hrms-frontend:latest \
             -f ./Dockerfile .
 
       - name: Push Docker image to Docker Hub
