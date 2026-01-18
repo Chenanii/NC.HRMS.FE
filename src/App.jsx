@@ -9,6 +9,8 @@ import Employees from './features/management/pages/Employees';
 import Departments from './features/management/pages/Departments';
 import Positions from './features/management/pages/Positions';
 import LeaveTypes from './features/leave/pages/leave-types';
+import LeaveRequests from './features/leave/pages/leave-requests';
+import RequestLeave from './features/leave/pages/request-leave';
 
 import DashboardContent from './features/dashboard/components/DashboardContent';
 import './index.css';
@@ -82,8 +84,9 @@ function App() {
           <Route path="management/positions" element={<Positions />} />
 
           {/* Nested management routes */}
-          <Route path="leave/leave-requests" element={<div>Leave Requests Page</div>} />
+          <Route path="leave/leave-requests" element={<LeaveRequests />} />
           <Route path="leave/leave-types" element={<LeaveTypes /> } />
+          <Route path="leave/request-leave" element={<RequestLeave /> } />
 
           {/* User management routes inside dashboard */}
           <Route path="users" element={<UserListPage />} />
