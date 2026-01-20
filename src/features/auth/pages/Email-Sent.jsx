@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Clock, RefreshCw, Check, ArrowLeft, Building, User, Globe } from 'lucide-react';
 
-const EmailSentPage = ({ 
-  email = "user@example.com", 
-  companyName = "Your Company",
-  subdomain = "your-company",
-  onResendEmail,
-  onBackToLogin 
-}) => {
+const EmailSentPage = () => {
+  const [email, setEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Cooldown timer for resend button
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    const storedEmail = localStorage.getItem('registration_email');
+    
+    setEmail(emailParam || storedEmail || 'user@example.com');
+    
+    if (storedEmail) {
+      localStorage.removeItem('registration_email');
+    }
+  }, []);
+
   useEffect(() => {
     let timer;
     if (resendCooldown > 0) {
@@ -24,38 +32,48 @@ const EmailSentPage = ({
   }, [resendCooldown]);
 
   const handleResendEmail = async () => {
-    if (resendCooldown > 0 || isResending) return;
+    if (resendCooldown > 0 || isResending || !email) return;
 
     setIsResending(true);
+    setShowError(false);
+    setErrorMessage('');
     
     try {
-      if (onResendEmail) {
-        await onResendEmail(email);
+      const response = await fetch('https://nexacircuit-hrms.com/api/Auth/resend-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && !data.isError) {
+        setShowSuccess(true);
+        setResendCooldown(60);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else {
+        throw new Error(data.message || 'Failed to resend confirmation email');
       }
-      setShowSuccess(true);
-      setResendCooldown(60); // 60 second cooldown
-      
-      setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
       console.error('Failed to resend email:', error);
+      setErrorMessage(error.message || 'Failed to resend email. Please try again.');
+      setShowError(true);
+      setTimeout(() => setShowError(false), 5000);
     } finally {
       setIsResending(false);
     }
   };
 
   const handleBackToLogin = () => {
-    if (onBackToLogin) {
-      onBackToLogin();
-    } else {
-      window.location.href = '/login';
-    }
+    window.location.href = '/login';
   };
 
   return (
     <div className="min-h-screen relative bg-gradient-to-br from-blue-50 via-indigo-50 to-green-100 flex items-center justify-center p-4 overflow-hidden">
-      {/* Background SVG Patterns - Same as registration */}
+      {/* Background SVG Patterns */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Floating geometric shapes */}
         <svg className="absolute top-10 left-10 w-20 h-20 text-blue-200 opacity-60" viewBox="0 0 100 100" fill="currentColor">
           <circle cx="50" cy="50" r="40" className="animate-pulse"/>
         </svg>
@@ -68,7 +86,6 @@ const EmailSentPage = ({
           <rect x="20" y="20" width="60" height="60" rx="10" className="animate-spin" style={{animationDuration: '8s'}}/>
         </svg>
 
-        {/* Grid pattern background */}
         <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100">
           <defs>
             <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
@@ -78,7 +95,6 @@ const EmailSentPage = ({
           <rect width="100%" height="100%" fill="url(#grid)" className="text-gray-400"/>
         </svg>
 
-        {/* Decorative dots */}
         <div className="absolute top-1/3 left-20">
           <div className="w-2 h-2 bg-blue-300 rounded-full animate-ping"></div>
         </div>
@@ -89,7 +105,6 @@ const EmailSentPage = ({
           <div className="w-2 h-2 bg-purple-300 rounded-full animate-bounce"></div>
         </div>
 
-        {/* Abstract flowing shapes */}
         <svg className="absolute top-0 right-0 w-96 h-96 text-gradient opacity-10" viewBox="0 0 400 400">
           <path d="M100,200 Q200,100 300,200 Q200,300 100,200 Z" fill="url(#gradient1)"/>
           <defs>
@@ -112,7 +127,6 @@ const EmailSentPage = ({
           </defs>
         </svg>
 
-        {/* Floating icons */}
         <div className="absolute top-20 right-1/4 text-blue-200 opacity-30">
           <Building className="w-8 h-8 animate-float" style={{animation: 'float 6s ease-in-out infinite'}}/>
         </div>
@@ -125,87 +139,99 @@ const EmailSentPage = ({
       </div>
 
       {/* Main content container */}
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md border border-white/20 relative z-10">
-        {/* Overlay */}
+      <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md border border-white/20 relative z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-3xl"></div>
 
         <div className="relative z-10">
-            {/* Success notification */}
-            {showSuccess && (
-            <div className="absolute top-4 left-4 right-4 bg-green-50 border border-green-200 rounded-lg p-3 flex items-center animate-slide-down z-20 text-sm text-green-700">
-                <Check className="w-4 h-4 text-green-600 mr-2" />
-                Confirmation email resent successfully!
+          {/* Success notification */}
+          {showSuccess && (
+            <div className="absolute top-4 left-4 right-4 bg-green-50 border border-green-200 rounded-lg p-3 flex items-center animate-slide-down z-20 text-sm text-green-700 shadow-lg">
+              <Check className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+              Confirmation email resent successfully!
             </div>
-            )}
+          )}
 
-            {/* Header */}
-            <div className="text-center p-6 pb-4">
-            <div className="w-12 h-12 bg-green-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg animate-pulse">
-                <Mail className="w-6 h-6 text-white"/>
+          {/* Error notification */}
+          {showError && (
+            <div className="absolute top-4 left-4 right-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start animate-slide-down z-20 text-sm text-red-700 shadow-lg">
+              <div className="w-4 h-4 rounded-full bg-red-200 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
+                <span className="text-red-700 text-xs font-bold">!</span>
+              </div>
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* Header */}
+          <div className="text-center p-6 pb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg animate-pulse">
+              <Mail className="w-8 h-8 text-white"/>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h1>
             <p className="text-sm text-gray-600">We've sent a confirmation link to verify your account</p>
-            </div>
+          </div>
 
-            {/* Email info card */}
-            <div className="px-6 pb-6 space-y-6">
-            <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-4 border border-blue-100 text-center">
-                <p className="text-sm text-gray-700">Confirmation email sent to:</p>
-                <p className="font-semibold text-gray-900 break-all">{email}</p>
+          {/* Email info card */}
+          <div className="px-6 pb-6 space-y-6">
+            <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-4 border border-blue-100">
+              <p className="text-xs text-gray-600 mb-1 text-center">Confirmation email sent to:</p>
+              <p className="font-semibold text-gray-900 break-all text-center text-sm">{email}</p>
             </div>
 
             {/* Notice */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start">
-                <Clock className="w-5 h-5 text-amber-600 mr-2 mt-0.5" />
-                <div className="text-sm text-amber-700">
-                <p className="font-medium text-amber-800">Important</p>
-                <p>The confirmation link will expire in 24 hours. Check spam if not found.</p>
-                </div>
+              <Clock className="w-5 h-5 text-amber-600 mr-3 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-amber-800">
+                <p className="font-medium text-amber-900 mb-1">Important</p>
+                <p>The confirmation link will expire in 24 hours. If you don't see the email, check your spam folder.</p>
+              </div>
             </div>
 
             {/* Buttons */}
             <div className="space-y-3">
-                <button
+              <button
                 onClick={handleResendEmail}
                 disabled={isResending || resendCooldown > 0}
-                className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white text-sm rounded-xl shadow-lg transition-all disabled:opacity-50"
-                >
+                className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm font-medium rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:transform-none"
+              >
                 {isResending ? (
-                    <>
+                  <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     Resending...
-                    </>
+                  </>
                 ) : resendCooldown > 0 ? (
-                    <>
+                  <>
                     <Clock className="w-4 h-4 mr-2" />
                     Resend in {resendCooldown}s
-                    </>
+                  </>
                 ) : (
-                    <>
+                  <>
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Resend Email
-                    </>
+                    Resend Confirmation Email
+                  </>
                 )}
-                </button>
+              </button>
 
-                <button
+              <button
                 onClick={handleBackToLogin}
-                className="w-full flex items-center justify-center px-4 py-3 text-gray-600 hover:text-gray-800 text-sm border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
-                >
+                className="w-full flex items-center justify-center px-4 py-3 text-gray-700 hover:text-gray-900 text-sm font-medium border-2 border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all transform hover:scale-105"
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Login
-                </button>
+              </button>
             </div>
-            </div>
+          </div>
 
-            {/* Footer */}
-            <div className="text-center p-4 pt-0 border-t border-gray-100/50 text-xs text-gray-600">
-            Need help?{" "}
-            <a href="/support" className="text-blue-600 hover:text-blue-700 font-medium">Contact Support</a>
-            </div>
+          {/* Footer */}
+          <div className="text-center p-6 pt-4 border-t border-gray-100/50">
+            <p className="text-xs text-gray-600">
+              Need help?{" "}
+              <a href="/support" className="text-green-600 hover:text-green-700 font-medium transition-colors underline">
+                Contact Support
+              </a>
+            </p>
+          </div>
         </div>
-        </div>
-
+      </div>
 
       <style>{`
         @keyframes float {

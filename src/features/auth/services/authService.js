@@ -68,7 +68,7 @@ export const checkSubdomainAvailability = async (subdomain) => {
 };
 
 export const resendConfirmationEmail = async (email) => {
-  const response = await fetch(`${API_BASE_URL}}/resend-confirmation`, {
+  const response = await fetch(`${API_BASE_URL}/resend-confirmation`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export const logout = async () => {
   const token = localStorage.getItem("nc_hrms_token");
 
   await axios.post(
-    `${API_BASE_URL}}/logout`,
+    `${API_BASE_URL}/logout`,
     {},
     {
       headers: {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Eye, EyeOff, Building, User, Mail, Briefcase, Globe, Check, X, Loader2, ChevronRight, ChevronLeft } from 'lucide-react';
-import { registerUser, registerWithGoogle } from "../services/authService"; 
-import { checkSubdomainAvailability } from "../services/authService"; 
+import { registerUser, registerWithGoogle, checkSubdomainAvailability } from "../services/authService"; 
 
 const RegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -49,46 +48,55 @@ const RegistrationForm = () => {
     }
   };
 
-  const handleGoogleSignUp = useCallback(async (credential) => {
+  const handleGoogleSignUp = useCallback(async (response) => {
     setGoogleLoading(true);
     setFeedback({ type: "", message: "" });
     
     try {
-      // Decode JWT to get user info
+      const credential = response.credential;
       const decodedToken = decodeGoogleJWT(credential);
       
       if (decodedToken) {
-        // Extract name from Google token
         const fullName = decodedToken.name || '';
-        const nameParts = fullName.split(' ');
+        const nameParts = fullName.trim().split(' ');
         const firstName = nameParts[0] || '';
         const lastName = nameParts.slice(1).join(' ') || '';
         
-        // Pre-fill form with Google data
         setFormData(prev => ({
           ...prev,
-          email: decodedToken.email || prev.email,
-          firstName: firstName || prev.firstName,
-          lastName: lastName || prev.lastName,
+          email: decodedToken.email || '',
+          firstName: firstName,
+          lastName: lastName,
         }));
         
         setGoogleCredential(credential);
         setIsGoogleSignUp(true);
         
-        // Skip to company setup step if personal info is filled
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.email;
+          delete newErrors.firstName;
+          delete newErrors.lastName;
+          delete newErrors.password; 
+          return newErrors;
+        });
+        
         if (firstName && decodedToken.email) {
           setCurrentStep(2);
+          setFeedback({ type: "success", message: "Successfully signed in with Google!" });
         }
       }
     } catch (error) {
+      console.error('Google sign-up error:', error);
       setFeedback({ type: "error", message: "Failed to process Google account. Please try again." });
+      setIsGoogleSignUp(false);
+      setGoogleCredential(null);
     } finally {
       setGoogleLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // Load Google Identity Services script
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
@@ -96,8 +104,9 @@ const RegistrationForm = () => {
     script.onload = () => {
       if (window.google && googleButtonRef.current) {
         window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
           callback: handleGoogleSignUp,
+          auto_select: false,
         });
 
         window.google.accounts.id.renderButton(
@@ -105,7 +114,7 @@ const RegistrationForm = () => {
           {
             theme: "outline",
             size: "large",
-            width: "100%",
+            width: googleButtonRef.current.offsetWidth,
             text: "signup_with",
             locale: "en",
           }
@@ -137,6 +146,7 @@ const RegistrationForm = () => {
                 lastChecked: subdomain
               });
             } catch (error) {
+              console.error('Subdomain check error:', error);
               setSubdomainCheck(prev => ({ ...prev, isChecking: false }));
             }
           } else {
@@ -164,20 +174,31 @@ const RegistrationForm = () => {
 
     currentFields.forEach(field => {
       if (field === 'email') {
-        if (!formData.email.trim()) newErrors.email = 'Email is required';
-        else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email';
+        if (!formData.email.trim()) {
+          newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+          newErrors.email = 'Please enter a valid email';
+        }
       } else if (field === 'password') {
-        // Skip password validation if using Google sign-up
         if (!isGoogleSignUp) {
-          if (!formData.password.trim()) newErrors.password = 'Password is required';
-          else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+          if (!formData.password.trim()) {
+            newErrors.password = 'Password is required';
+          } else if (formData.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters';
+          }
         }
       } else if (field === 'firstName') {
-        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+        if (!formData.firstName.trim()) {
+          newErrors.firstName = 'First name is required';
+        }
       } else if (field === 'lastName') {
-        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+        if (!formData.lastName.trim()) {
+          newErrors.lastName = 'Last name is required';
+        }
       } else if (field === 'companyName') {
-        if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
+        if (!formData.companyName.trim()) {
+          newErrors.companyName = 'Company name is required';
+        }
       } else if (field === 'subdomain') {
         if (!formData.subdomain.trim()) {
           newErrors.subdomain = 'Subdomain is required';
@@ -215,14 +236,18 @@ const RegistrationForm = () => {
   const handleNext = () => {
     if (validateStep(currentStep)) {
       setCurrentStep(prev => Math.min(prev + 1, steps.length));
+      setFeedback({ type: "", message: "" });
     }
   };
 
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
+    setFeedback({ type: "", message: "" });
   };
 
   const handleSubmit = async () => {
+    // For Google sign-up, we're on step 2 (company setup) when submitting
+    // For regular sign-up, we're on step 3 (security)
     if (!validateStep(currentStep)) return;
 
     setIsLoading(true);
@@ -232,31 +257,54 @@ const RegistrationForm = () => {
       let result;
       
       if (isGoogleSignUp && googleCredential) {
-        // Register with Google (skip password validation for Google sign-up)
-        const companyData = {
+        const registrationData = {
+          credential: googleCredential,
           companyName: formData.companyName,
           subdomain: formData.subdomain,
-          jobTitle: formData.jobTitle,
+          jobTitle: formData.jobTitle || '',
         };
-        result = await registerWithGoogle(googleCredential, companyData);
+        result = await registerWithGoogle(googleCredential, registrationData);
       } else {
-        // Regular registration
-        result = await registerUser(formData);
+        result = await registerUser({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          companyName: formData.companyName,
+          subdomain: formData.subdomain,
+          jobTitle: formData.jobTitle || '',
+        });
       }
       
-      setFeedback({ type: "success", message: "Registration successful!" });
+      setFeedback({ 
+        type: "success", 
+        message: isGoogleSignUp 
+          ? "Account created successfully with Google!" 
+          : "Registration successful! Check your email to verify your account."
+      });
 
-      const response = result?.data || {};
-      
       setTimeout(() => {
-        window.location.href = "/email-sent";
+      if (isGoogleSignUp) {
+        let requestResponse = result.requestResponse;
+
+        localStorage.setItem("nc_hrms_token", requestResponse.result.token);
+        localStorage.setItem("nc_hrms_permissions", JSON.stringify(requestResponse.result.permissions));
+        localStorage.setItem("nc_hrms_user", JSON.stringify(requestResponse.result.user));
+
+        window.location.href = "/dashboard";
+      } else {
+        localStorage.setItem('registration_email', formData.email);
+        window.location.href = `/email-sent?email=${encodeURIComponent(formData.email)}`;
+       }
       }, 1500);
 
     } catch (error) {
       console.error("Registration failed:", error);
 
-      // if backend sends details use them, else fallback
-      const errorMsg = error?.response?.data?.message || error.message || "Something went wrong. Please try again.";
+      const errorMsg = error?.response?.data?.message 
+        || error.message 
+        || "Registration failed. Please try again.";
+      
       setFeedback({ type: "error", message: errorMsg });
     } finally {
       setIsLoading(false);
@@ -281,9 +329,10 @@ const RegistrationForm = () => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
+                    disabled={isGoogleSignUp}
                     className={`w-full pl-9 pr-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
                       errors.firstName ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isGoogleSignUp ? 'bg-gray-50 cursor-not-allowed' : ''}`}
                     placeholder="John"
                   />
                 </div>
@@ -302,9 +351,10 @@ const RegistrationForm = () => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
+                    disabled={isGoogleSignUp}
                     className={`w-full pl-9 pr-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
                       errors.lastName ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isGoogleSignUp ? 'bg-gray-50 cursor-not-allowed' : ''}`}
                     placeholder="Doe"
                   />
                 </div>
@@ -324,18 +374,25 @@ const RegistrationForm = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  disabled={isGoogleSignUp}
                   className={`w-full pl-9 pr-3 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  } ${isGoogleSignUp ? 'bg-gray-50 cursor-not-allowed' : ''}`}
                   placeholder="john@company.com"
                 />
               </div>
               {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+              {isGoogleSignUp && (
+                <p className="mt-1 text-xs text-green-600 flex items-center">
+                  <Check className="w-3 h-3 mr-1" />
+                  Pre-filled from Google account
+                </p>
+              )}
             </div>
           </div>
         );
 
-       case 2:
+      case 2:
         return (
           <div className="space-y-4">
             <div>
@@ -535,11 +592,12 @@ const RegistrationForm = () => {
     }
   };
 
+  const totalSteps = isGoogleSignUp ? 2 : 3;
+  const visibleSteps = isGoogleSignUp ? steps.filter(s => s.id !== 3) : steps;
+
   return (
     <div className="min-h-screen relative bg-gradient-to-br from-blue-50 via-indigo-50 to-green-100 flex items-center justify-center p-4 overflow-hidden">
-      {/* Background SVG Patterns */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Floating geometric shapes */}
         <svg className="absolute top-10 left-10 w-20 h-20 text-blue-200 opacity-60" viewBox="0 0 100 100" fill="currentColor">
           <circle cx="50" cy="50" r="40" className="animate-pulse"/>
         </svg>
@@ -552,7 +610,6 @@ const RegistrationForm = () => {
           <rect x="20" y="20" width="60" height="60" rx="10" className="animate-spin" style={{animationDuration: '8s'}}/>
         </svg>
 
-        {/* Grid pattern background */}
         <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100">
           <defs>
             <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
@@ -562,7 +619,6 @@ const RegistrationForm = () => {
           <rect width="100%" height="100%" fill="url(#grid)" className="text-gray-400"/>
         </svg>
 
-        {/* Decorative dots */}
         <div className="absolute top-1/3 left-20">
           <div className="w-2 h-2 bg-blue-300 rounded-full animate-ping"></div>
         </div>
@@ -573,30 +629,6 @@ const RegistrationForm = () => {
           <div className="w-2 h-2 bg-purple-300 rounded-full animate-bounce"></div>
         </div>
 
-        {/* Abstract flowing shapes */}
-        <svg className="absolute top-0 right-0 w-96 h-96 text-gradient opacity-10" viewBox="0 0 400 400">
-          <path d="M100,200 Q200,100 300,200 Q200,300 100,200 Z" fill="url(#gradient1)"/>
-          <defs>
-            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3B82F6"/>
-              <stop offset="50%" stopColor="#8B5CF6"/>
-              <stop offset="100%" stopColor="#10B981"/>
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <svg className="absolute bottom-0 left-0 w-80 h-80 text-gradient opacity-10" viewBox="0 0 300 300">
-          <path d="M50,150 Q150,50 250,150 Q150,250 50,150 Z" fill="url(#gradient2)"/>
-          <defs>
-            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#10B981"/>
-              <stop offset="50%" stopColor="#3B82F6"/>
-              <stop offset="100%" stopColor="#F59E0B"/>
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* Floating icons */}
         <div className="absolute top-20 right-1/4 text-blue-200 opacity-30">
           <Building className="w-8 h-8 animate-float" style={{animation: 'float 6s ease-in-out infinite'}}/>
         </div>
@@ -608,29 +640,25 @@ const RegistrationForm = () => {
         </div>
       </div>
 
-      {/* Main form container with enhanced styling */}
       <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md border border-white/20 relative z-10">
-        {/* Glassmorphism overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-3xl"></div>
         
         <div className="relative z-10">
-          {/* Header */}
           <div className="text-center p-6 pb-4">
             <div className="w-16 h-16 bg-green-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
               <User className="w-8 h-8 text-white"/>
             </div>
             <h1 className="text-xl font-bold text-gray-900 mb-1">Create Your Account</h1>
-            <p className="text-sm text-gray-600">Step {currentStep} of {isGoogleSignUp ? steps.length - 1 : steps.length}</p>
+            <p className="text-sm text-gray-600">Step {currentStep} of {totalSteps}</p>
           </div>
 
-          {/* Google Sign-Up Button - Show only on first step if not already using Google */}
           {currentStep === 1 && !isGoogleSignUp && (
             <div className="px-6 pb-4">
               <div ref={googleButtonRef} className="w-full flex justify-center mb-4"></div>
               {googleLoading && (
                 <div className="text-center mb-2">
                   <span className="flex items-center justify-center text-sm text-gray-600">
-                    <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Processing Google account...
                   </span>
                 </div>
@@ -646,10 +674,9 @@ const RegistrationForm = () => {
             </div>
           )}
 
-          {/* Progress Bar */}
           <div className="px-6 pb-4">
             <div className="flex items-center justify-between mb-2">
-              {steps.map((step) => (
+              {visibleSteps.map((step, index) => (
                 <div key={step.id} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
                     step.id < currentStep 
@@ -658,9 +685,9 @@ const RegistrationForm = () => {
                       ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg animate-pulse' 
                       : 'bg-gray-200 text-gray-600'
                   }`}>
-                    {step.id < currentStep ? <Check className="w-4 h-4" /> : step.id}
+                    {step.id < currentStep ? <Check className="w-4 h-4" /> : index + 1}
                   </div>
-                  {step.id < steps.length && (
+                  {index < visibleSteps.length - 1 && (
                     <div className={`w-8 h-1 mx-2 rounded-full transition-all duration-500 ${
                       step.id < currentStep ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gray-200'
                     }`}></div>
@@ -669,38 +696,38 @@ const RegistrationForm = () => {
               ))}
             </div>
             <div className="flex justify-between text-xs text-gray-600">
-              {steps.map((step) => (
+              {visibleSteps.map((step) => (
                 <span key={step.id} className={step.id === currentStep ? 'font-medium text-green-600' : ''}>
                   {step.title}
                 </span>
               ))}
             </div>
           </div>
+
           {feedback.message && (
-            <div
-              className={`mb-4 px-4 py-2 rounded-lg text-sm flex items-center ${
-                feedback.type === "success"
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-red-50 text-red-700 border border-red-200"
-              }`}
-            >
-              {feedback.type === "success" ? (
-                <Check className="w-4 h-4 mr-2 text-green-600" />
-              ) : (
-                <X className="w-4 h-4 mr-2 text-red-600" />
-              )}
-              {feedback.message}
+            <div className="px-6 pb-4">
+              <div
+                className={`px-4 py-2 rounded-lg text-sm flex items-center ${
+                  feedback.type === "success"
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-red-50 text-red-700 border border-red-200"
+                }`}
+              >
+                {feedback.type === "success" ? (
+                  <Check className="w-4 h-4 mr-2 text-green-600 flex-shrink-0" />
+                ) : (
+                  <X className="w-4 h-4 mr-2 text-red-600 flex-shrink-0" />
+                )}
+                <span>{feedback.message}</span>
+              </div>
             </div>
           )}
 
-
-          {/* Form Content */}
           <div className="px-6 pb-6">
             <div className="transition-all duration-300 ease-in-out">
               {renderStepContent()}
             </div>
 
-            {/* Navigation */}
             <div className="flex justify-between mt-6">
               <button
                 type="button"
@@ -712,7 +739,7 @@ const RegistrationForm = () => {
                 Back
               </button>
 
-              {currentStep < (isGoogleSignUp ? steps.length - 1 : steps.length) ? (
+              {currentStep < totalSteps ? (
                 <button
                   type="button"
                   onClick={handleNext}
@@ -726,11 +753,11 @@ const RegistrationForm = () => {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isLoading}
-                  className="px-6 py-2 bg-green-800 hover:from-green-700 hover:to-blue-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                  className="px-6 py-2 bg-gradient-to-r from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white text-sm rounded-lg focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
                 >
                   {isLoading ? (
                     <span className="flex items-center">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Creating...
                     </span>
                   ) : (
@@ -745,7 +772,7 @@ const RegistrationForm = () => {
           <div className="text-center p-4 pt-0 border-t border-gray-100/50">
             <p className="text-xs text-gray-600">
               Already have an account?{' '}
-              <a href="/login" className="text-transparent bg-green-600 bg-clip-text hover:from-green-500 hover:to-blue-500 font-medium transition-all duration-200">
+              <a href="/login" className="text-green-600 hover:text-green-700 font-medium transition-all duration-200">
                 Login
               </a>
             </p>
