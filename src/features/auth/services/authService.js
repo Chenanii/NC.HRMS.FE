@@ -101,6 +101,7 @@ export const loginWithGoogle = async (credential) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/login/google`,
+      { credential: credential.credential },
       { headers: { "Content-Type": "application/json" } }
     );
     
