@@ -101,7 +101,6 @@ export const loginWithGoogle = async (credential) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/login/google`,
-      { credential: credential },
       { headers: { "Content-Type": "application/json" } }
     );
     
@@ -122,7 +121,7 @@ export const loginWithGoogle = async (credential) => {
 export const registerWithGoogle = async (credential, companyData) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/register/google`, {
-      credential: credential,
+      credential: credential.credential,
       ...companyData,
     });
 
