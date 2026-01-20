@@ -101,7 +101,7 @@ export const loginWithGoogle = async (credential) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/login/google`,
-      { Credential: credential },  // ✅ Capital C to match the DTO
+      { credential: credential },
       { headers: { "Content-Type": "application/json" } }
     );
     
