@@ -287,10 +287,26 @@ const Employees = () => {
   // === Submit ===
   const handleSubmit = async () => {
     try {
-      const payload = {
-        ...formData,
-        baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
-      };
+     const payload = {
+      EmployeeNumber: formData.employeeNumber,
+      FirstName: formData.firstName,
+      LastName: formData.lastName,
+      MiddleName: formData.middleName || null,
+      Email: formData.email,
+      PhoneNumber: formData.phoneNumber || null,
+      DateOfBirth: formData.dateOfBirth || new Date().toISOString(),
+      Gender: formData.gender || "Not Specified",
+      DepartmentId: formData.departmentId,
+      PositionId: formData.positionId,
+      ManagerId: formData.managerId || null,
+      HireDate: formData.hireDate ? new Date(formData.hireDate).toISOString() : new Date().toISOString(),
+      BaseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
+      Address: formData.address || null,
+      EmergencyContactName: formData.emergencyContactName || null,
+      EmergencyContactPhone: formData.emergencyContactPhone || null,
+      NationalIdNumber: formData.nationalIdNumber || null,
+      TaxNumber: formData.taxNumber || null,
+    };
 
       if (editingEmployee) {
         if (!hasPermission("employees.edit")) {
