@@ -9,6 +9,9 @@ import logo from "../../assets/images/logo-tx.png";
 import logowhite from "../../assets/images/logo-white.png";
 import { Link } from "react-router-dom";
 
+// NOTE: our eslint setup doesn't treat `<motion.*>` JSX as a variable usage.
+void motion;
+
 export default function EnhancedNcHrmsLanding() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);

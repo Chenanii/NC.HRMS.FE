@@ -59,9 +59,9 @@ const Departments = () => {
   const [loading, setLoading] = useState(false);
   
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
+  const [page, _setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [total, setTotal] = useState(0);
+  const [_total, setTotal] = useState(0);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState(null);

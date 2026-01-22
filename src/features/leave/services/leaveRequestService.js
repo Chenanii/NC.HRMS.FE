@@ -1,74 +1,49 @@
-import axios from "axios";
-import { getToken } from "../../utilits/auth";
+import { apiClient } from "../../utilits/apiClient";
 
-const API_BASE = "https://nexacircuit-hrms.com/api/LeaveRequest";
-
-const getHeaders = () => ({
-  headers: {
-    ...getToken(),
-  },
-});
+const LEAVE_REQUEST_BASE = "/api/LeaveRequest";
 
 export const createLeaveRequest = async (payload) => {
-  const config = getHeaders();
-  console.log("Request headers:", config);
-  console.log("Request payload:", payload);
-  
-  try {
-    const response = await axios.post(
-      `${API_BASE}/createleaverequest`,
-      payload,
-      config
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Full error object:", error);
-    console.error("Error response data:", error.response?.data);
-    console.error("Error response status:", error.response?.status);
-    console.error("Error message:", error.message);
-    throw error;
-  }
+  const response = await apiClient.post(
+    `${LEAVE_REQUEST_BASE}/createleaverequest`,
+    payload
+  );
+  return response.data;
 };
 
 export const modifyLeaveRequest = async (leaveRequestId, payload) => {
-  const response = await axios.put(
-    `${API_BASE}/modifyleaverequest/${leaveRequestId}`,
-    payload,
-    getHeaders()
+  const response = await apiClient.put(
+    `${LEAVE_REQUEST_BASE}/modifyleaverequest/${leaveRequestId}`,
+    payload
   );
   return response.data;
 };
 
 export const approveLeaveRequest = async (leaveRequestId, comments) => {
-  const response = await axios.put(
-    `${API_BASE}/approveleaverequest/${leaveRequestId}`,
+  const response = await apiClient.put(
+    `${LEAVE_REQUEST_BASE}/approveleaverequest/${leaveRequestId}`,
     { comments },
-    getHeaders()
   );
   return response.data;
 };
 
 export const rejectLeaveRequest = async (leaveRequestId, reason) => {
-  const response = await axios.put(
-    `${API_BASE}/rejectleaverequest/${leaveRequestId}`,
+  const response = await apiClient.put(
+    `${LEAVE_REQUEST_BASE}/rejectleaverequest/${leaveRequestId}`,
     { reason },
-    getHeaders()
   );
   return response.data;
 };
 
 export const getEmployeeLeaveRequests = async (employeeId) => {
-  const response = await axios.get(
-    `${API_BASE}/getemployeeleaverequests/${employeeId}`,
-    getHeaders()
+  const response = await apiClient.get(
+    `${LEAVE_REQUEST_BASE}/getemployeeleaverequests/${employeeId}`
   );
   return response.data;
 };
 
 export const getPendingLeaveRequests = async (managerId = null) => {
-  const response = await axios.get(`${API_BASE}/pending`, {
+  const response = await apiClient.get(`${LEAVE_REQUEST_BASE}/pending`, {
     params: managerId ? { managerId } : {},
-    ...getHeaders(),
   });
   return response.data;
 };

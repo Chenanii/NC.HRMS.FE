@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { fetchLeaveTypes } from "../services/leaveTypesService";
 import { createLeaveRequest } from "../services/leaveRequestService";
+import { getCurrentEmployeeId } from "../../utilits/auth";
 
 const Spinner = ({ label }) => (
   <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -10,6 +13,7 @@ const Spinner = ({ label }) => (
 );
 
 const LeaveRequest = () => {
+  const navigate = useNavigate();
   const [leaveTypes, setLeaveTypes] = useState([]);
   const [loadingTypes, setLoadingTypes] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -22,30 +26,13 @@ const LeaveRequest = () => {
     reason: "",
   });
 
-  // Get current user's employee ID
-  const getEmployeeId = () => {
-    try {
-      const user = JSON.parse(localStorage.getItem("nc_hrms_user"));
-      console.log("Full user object:", JSON.stringify(user, null, 2));
-      
-      // Try different possible property names
-      const id = user?.employeeId || user?.id || user?.userId || user?.employee?.id;
-      console.log("Extracted employee ID:", id);
-      return id;
-    } catch (e) {
-      console.error("Error parsing user data:", e);
-      return null;
-    }
-  };
-
   useEffect(() => {
     const loadLeaveTypes = async () => {
       try {
         const data = await fetchLeaveTypes();
         const items = Array.isArray(data) ? data : data?.items || [];
         setLeaveTypes(items);
-      } catch (e) {
-        console.error("Load leave types error:", e);
+      } catch {
         setError("Failed to load leave types.");
       } finally {
         setLoadingTypes(false);
@@ -64,10 +51,15 @@ const LeaveRequest = () => {
       return;
     }
 
+    if (new Date(form.endDate) < new Date(form.startDate)) {
+      setError("End date must be the same as or after the start date.");
+      return;
+    }
+
     try {
       setSubmitting(true);
 
-      const employeeId = getEmployeeId();
+      const employeeId = getCurrentEmployeeId();
       if (!employeeId) {
         setError("Unable to identify current user. Please log in again.");
         return;
@@ -85,19 +77,18 @@ const LeaveRequest = () => {
         reason: form.reason || null,
       };
 
-      console.log("Sending leave request payload:", payload);
-
       await createLeaveRequest(payload);
 
-      alert("Leave request submitted successfully.");
+      toast.success("Leave request submitted.");
       setForm({ leaveTypeId: "", startDate: "", endDate: "", reason: "" });
+      navigate("/dashboard/leave/my-leave-requests");
     } catch (e) {
-      console.error("Submit leave request error:", e);
       const errorMessage = 
         typeof e.response?.data === "string" 
           ? e.response.data 
           : e.response?.data?.message || e.message || "Failed to submit leave request.";
       setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -126,6 +117,7 @@ const LeaveRequest = () => {
               onChange={(e) =>
                 setForm({ ...form, leaveTypeId: e.target.value })
               }
+              disabled={submitting}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500"
             >
               <option value="">Select leave type</option>
@@ -149,6 +141,7 @@ const LeaveRequest = () => {
               onChange={(e) =>
                 setForm({ ...form, startDate: e.target.value })
               }
+              disabled={submitting}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -163,6 +156,7 @@ const LeaveRequest = () => {
               onChange={(e) =>
                 setForm({ ...form, endDate: e.target.value })
               }
+              disabled={submitting}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -176,6 +170,7 @@ const LeaveRequest = () => {
             rows={3}
             value={form.reason}
             onChange={(e) => setForm({ ...form, reason: e.target.value })}
+            disabled={submitting}
             className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500"
             placeholder="Brief reason for leave"
           />

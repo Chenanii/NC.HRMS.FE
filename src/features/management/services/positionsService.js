@@ -1,47 +1,28 @@
-import axios from "axios";
+import { apiClient } from "../../utilits/apiClient";
 
-const API_BASE = "https://nexacircuit-hrms.com/api/positions";
-const API_BASE_Department = "https://nexacircuit-hrms.com/api/departments";
-
-const getToken = () => localStorage.getItem("nc_hrms_token");
+const POSITIONS_BASE = "/api/positions";
+const DEPARTMENTS_BASE = "/api/departments";
 
 export const fetchPositions = async () => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/getallpositions`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${POSITIONS_BASE}/getallpositions`);
   return res.data || [];
 };
 
 export const fetchDepartments = async () => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE_Department}/getalldepartments`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${DEPARTMENTS_BASE}/getalldepartments`);
   return res.data||[];
 };
 
 export const createPosition = async (data) => {
-  const token = getToken();
-  const res = await axios.post(`${API_BASE}/createposition`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.post(`${POSITIONS_BASE}/createposition`, data);
   return res.data;
 };
 
 export const updatePosition = async (id, data) => {
-  const token = getToken();
-  const res = await axios.put(`${API_BASE}/updateposition/${id}`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  console.log("Update Response:", res.data);
+  const res = await apiClient.put(`${POSITIONS_BASE}/updateposition/${id}`, data);
   return res.data;
 };
 
 export const deletePosition = async (id) => {
-  const token = getToken();
-  await axios.delete(`${API_BASE}/deleteposition/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  await apiClient.delete(`${POSITIONS_BASE}/deleteposition/${id}`);
 };

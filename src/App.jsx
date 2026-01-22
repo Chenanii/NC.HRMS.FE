@@ -11,11 +11,14 @@ import Positions from './features/management/pages/Positions';
 import LeaveTypes from './features/leave/pages/leave-types';
 import LeaveRequests from './features/leave/pages/leave-requests';
 import RequestLeave from './features/leave/pages/request-leave';
+import MyLeaveRequests from './features/leave/pages/my-leave-requests';
 
 
 import DashboardContent from './features/dashboard/components/DashboardContent';
 import './index.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import RequireAuth from './features/auth/components/RequireAuth';
+import RequirePermission from './features/auth/components/RequirePermission';
 // Dashboard routes
 import Dashboard from './features/dashboard/pages/Dashboard';
 
@@ -75,24 +78,98 @@ function App() {
         />
 
         {/* Protected routes (after login) */}
-        <Route path="/dashboard" element={<Dashboard />}>
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          }
+        >
           {/* index route for /dashboard */}
           <Route index element={ <DashboardContent/>  } />
 
           {/* Nested management routes */}
-          <Route path="management/employees" element={<Employees />} />
-          <Route path="management/departments" element={<Departments />} />
-          <Route path="management/positions" element={<Positions />} />
+          <Route
+            path="management/employees"
+            element={
+              <RequirePermission anyOf={["employees.view"]}>
+                <Employees />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="management/departments"
+            element={
+              <RequirePermission anyOf={["departments.view"]}>
+                <Departments />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="management/positions"
+            element={
+              <RequirePermission anyOf={["positions.view"]}>
+                <Positions />
+              </RequirePermission>
+            }
+          />
 
           {/* Nested management routes */}
-          <Route path="leave/leave-requests" element={<LeaveRequests />} />
-          <Route path="leave/leave-types" element={<LeaveTypes /> } />
+          <Route
+            path="leave/leave-requests"
+            element={
+              <RequirePermission anyOf={["leave.view_all"]}>
+                <LeaveRequests />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="leave/leave-types"
+            element={
+              <RequirePermission anyOf={["leavetypes.view"]}>
+                <LeaveTypes />
+              </RequirePermission>
+            }
+          />
           <Route path="leave/request-leave" element={<RequestLeave /> } />
+          <Route path="leave/my-leave-requests" element={<MyLeaveRequests /> } />
 
           {/* User management routes inside dashboard */}
-          <Route path="users" element={<UserListPage />} />
-          <Route path="users/new" element={<UserForm />} />
-          <Route path="users/edit/:id" element={<UserForm isEdit={true} />} />
+          <Route
+            path="users"
+            element={
+              <RequirePermission anyOf={["users.view"]}>
+                <UserListPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="users/new"
+            element={
+              <RequirePermission anyOf={["users.view"]}>
+                <UserForm />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="users/edit/:id"
+            element={
+              <RequirePermission anyOf={["users.view"]}>
+                <UserForm isEdit={true} />
+              </RequirePermission>
+            }
+          />
+
+          {/* Align with sidebar "Settings" paths */}
+          <Route
+            path="settings/users"
+            element={
+              <RequirePermission anyOf={["users.view"]}>
+                <UserListPage />
+              </RequirePermission>
+            }
+          />
 
         </Route>
       </Routes>

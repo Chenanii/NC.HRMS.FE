@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { getEmployeeLeaveRequests } from "../services/leaveRequestService";
-import { getUserPermissions } from "../../utilits/auth";
-import * as leaveRequestService from "../services/leaveRequestService";
+import toast from "react-hot-toast";
+import {
+  approveLeaveRequest,
+  getPendingLeaveRequests,
+  rejectLeaveRequest,
+} from "../services/leaveRequestService";
+
+const normalizeItems = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.items)) return data.items;
+  if (Array.isArray(data.result)) return data.result;
+  if (Array.isArray(data.data)) return data.data;
+  return [];
+};
+
+const formatDate = (value) => {
+  if (!value) return "";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleDateString();
+};
 
 
 export default function LeaveRequests() {
@@ -10,6 +28,7 @@ export default function LeaveRequests() {
   const [error, setError] = useState("");
   const [comment, setComment] = useState("");
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchPendingRequests();
@@ -18,10 +37,15 @@ export default function LeaveRequests() {
   const fetchPendingRequests = async () => {
     setLoading(true);
     try {
-      const res = await leaveRequestService.getPendingLeaveRequests();
-      setLeaveRequests(res.data);
+      const data = await getPendingLeaveRequests();
+      setLeaveRequests(normalizeItems(data));
     } catch (err) {
-      setError(err.response?.data || "Failed to load leave requests");
+      const message =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : "") ||
+        err?.message ||
+        "Failed to load leave requests";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -29,26 +53,42 @@ export default function LeaveRequests() {
 
   const approveRequest = async (leaveRequestId) => {
     try {
-      await leaveRequestService.approveLeaveRequest(leaveRequestId, {
-        comments: comment,
-      });
-      fetchPendingRequests();
+      setSubmitting(true);
+      await approveLeaveRequest(leaveRequestId, comment);
+      toast.success("Leave request approved.");
+      await fetchPendingRequests();
       resetModal();
     } catch (err) {
-      alert(err.response?.data || "Approval failed");
+      const message =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : "") ||
+        err?.message ||
+        "Approval failed";
+      toast.error(message);
     }
+    setSubmitting(false);
   };
 
   const rejectRequest = async (leaveRequestId) => {
     try {
-      await leaveRequestService.rejectLeaveRequest(leaveRequestId, {
-        reason: comment,
-      });
-      fetchPendingRequests();
+      if (!comment.trim()) {
+        toast.error("Please provide a reason for rejection.");
+        return;
+      }
+      setSubmitting(true);
+      await rejectLeaveRequest(leaveRequestId, comment);
+      toast.success("Leave request rejected.");
+      await fetchPendingRequests();
       resetModal();
     } catch (err) {
-      alert(err.response?.data || "Rejection failed");
+      const message =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : "") ||
+        err?.message ||
+        "Rejection failed";
+      toast.error(message);
     }
+    setSubmitting(false);
   };
 
   const resetModal = () => {
@@ -83,9 +123,9 @@ export default function LeaveRequests() {
           {leaveRequests.map((req) => (
             <tr key={req.id}>
               <td className="border p-2">{req.employeeName}</td>
-              <td className="border p-2">{req.leaveType}</td>
-              <td className="border p-2">{req.startDate}</td>
-              <td className="border p-2">{req.endDate}</td>
+              <td className="border p-2">{req.leaveTypeName || req.leaveType}</td>
+              <td className="border p-2">{formatDate(req.startDate)}</td>
+              <td className="border p-2">{formatDate(req.endDate)}</td>
               <td className="border p-2">{req.totalDays}</td>
               <td className="border p-2">{req.status}</td>
               <td className="border p-2 flex gap-2">
@@ -132,6 +172,7 @@ export default function LeaveRequests() {
               <button
                 className="px-3 py-1 border rounded"
                 onClick={resetModal}
+                disabled={submitting}
               >
                 Cancel
               </button>
@@ -140,15 +181,17 @@ export default function LeaveRequests() {
                 <button
                   className="px-3 py-1 bg-green-600 text-white rounded"
                   onClick={() => approveRequest(selectedRequest.id)}
+                  disabled={submitting}
                 >
-                  Approve
+                  {submitting ? "Approving..." : "Confirm Approve"}
                 </button>
               ) : (
                 <button
                   className="px-3 py-1 bg-red-600 text-white rounded"
                   onClick={() => rejectRequest(selectedRequest.id)}
+                  disabled={submitting}
                 >
-                  Reject
+                  {submitting ? "Rejecting..." : "Confirm Reject"}
                 </button>
               )}
             </div>

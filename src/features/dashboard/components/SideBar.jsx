@@ -14,25 +14,10 @@ import {
   ChevronDown,
   Shield
 } from 'lucide-react';
-import { getUserPermissions } from '../../utilits/auth';
+import { hasPermission } from '../../utilits/auth';
 import logoblack from "../../../assets/images/logo-black.png";
 
-const getPermissions = () => {
-  try {
-    
-    const permissionsInfo = getUserPermissions();
-    return permissionsInfo || [];
-  } catch {
-    return [];
-  }
-};
-
-const hasPermission = (permission) => {
-  const permissions = getPermissions();
-  return permissions.includes(permission);
-};
-
-const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
+const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
   const [expandedSections, setExpandedSections] = useState(['management']);
 
   const toggleSection = (section) => {
@@ -107,6 +92,13 @@ const Sidebar = ({ isOpen, onClose, activeItem, onItemSelect }) => {
         label: 'Request Leave',
         icon: Calendar,
         path: '/dashboard/leave/request-leave',
+        permission: 'leave.create',
+      },
+      {
+        id: 'my-leave-requests',
+        label: 'My Leave Requests',
+        icon: Calendar,
+        path: '/dashboard/leave/my-leave-requests',
       },
     ]
   },

@@ -1,11 +1,11 @@
-import axios from "axios";
+import { apiClient } from "../../utilits/apiClient";
 
-const API_BASE_URL = "https://nexacircuit-hrms.com/api/Auth";
+const AUTH_BASE = "/api/Auth";
 
 // Login request
 export const login = async (form) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/login`, {
+    const response = await apiClient.post(`${AUTH_BASE}/login`, {
       email: form.email,
       password: form.password,
     });
@@ -25,11 +25,7 @@ export const login = async (form) => {
 
 export async function registerUser(payload) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/register`, payload, {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+    const response = await apiClient.post(`${AUTH_BASE}/register`, payload);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -51,8 +47,8 @@ export const checkSubdomainAvailability = async (subdomain) => {
   }
 
   try {
-  const response = await axios.post(
-      `${API_BASE_URL}/check-subdomain`,
+    const response = await apiClient.post(
+      `${AUTH_BASE}/check-subdomain`,
       JSON.stringify(subdomain),
       { headers: { "Content-Type": "application/json" } }
     );
@@ -60,55 +56,35 @@ export const checkSubdomainAvailability = async (subdomain) => {
     // Available when isError is false
     return response.data?.isError === false;
     
-  } catch (error) {
-    console.error("Error checking subdomain:", error);
+  } catch {
     // Fallback to not available on error
     return false;
   }
 };
 
 export const resendConfirmationEmail = async (email) => {
-  const response = await fetch(`${API_BASE_URL}/resend-confirmation`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to resend confirmation email');
+  try {
+    const res = await apiClient.post(`${AUTH_BASE}/resend-confirmation`, { email });
+    return res.data;
+  } catch {
+    throw new Error("Failed to resend confirmation email");
   }
-
-  return response.json();
 };
 
 export const logout = async () => {
-  const token = localStorage.getItem("nc_hrms_token");
-
-  await axios.post(
-    `${API_BASE_URL}/logout`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  await apiClient.post(`${AUTH_BASE}/logout`, {});
 };
 
 export const loginWithGoogle = async (credential) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/login/google`,
+    const response = await apiClient.post(
+      `${AUTH_BASE}/login/google`,
       { credential: credential.credential },
       { headers: { "Content-Type": "application/json" } }
     );
     
-    console.log("Google login response:", response);
     return response.data;
   } catch (error) {
-    console.error("Full error response:", error.response?.data); // Add this for debugging
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
@@ -121,7 +97,7 @@ export const loginWithGoogle = async (credential) => {
 // Google OAuth registration
 export const registerWithGoogle = async (credential, companyData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/register/google`, {
+    const response = await apiClient.post(`${AUTH_BASE}/register/google`, {
       credential: credential.credential,
       ...companyData,
     });

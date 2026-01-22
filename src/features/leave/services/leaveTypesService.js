@@ -1,47 +1,28 @@
-import axios from "axios";
+import { apiClient } from "../../utilits/apiClient";
 
-const API_BASE = "https://nexacircuit-hrms.com/api/LeaveType";
-
-
-
-const getToken = () => localStorage.getItem("nc_hrms_token");
+const LEAVE_TYPE_BASE = "/api/LeaveType";
 
 export const fetchLeaveTypes = async () => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/getallleavetypes`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${LEAVE_TYPE_BASE}/getallleavetypes`);
   return res.data || [];
 };
 
 export const createLeaveType = async (data) => {
-  const token = getToken();
-  const res = await axios.post(`${API_BASE}/createleavetype`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.post(`${LEAVE_TYPE_BASE}/createleavetype`, data);
   return res.data;
 };
 
 export const fetchLeaveTypeById = async (id) => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/getleavetypebyid/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${LEAVE_TYPE_BASE}/getleavetypebyid/${id}`);
   return res.data || {};
 };
 
 export const updateLeaveType = async (id, data) => {
-  const token = getToken();
-  const res = await axios.put(`${API_BASE}/modifyleavetype/${id}`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.put(`${LEAVE_TYPE_BASE}/modifyleavetype/${id}`, data);
   return res.data;
 };
 
 export const deleteLeaveType = async (id) => {
-  const token = getToken();
-  const res = await axios.delete(`${API_BASE}/deleteleavetype/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.delete(`${LEAVE_TYPE_BASE}/deleteleavetype/${id}`);
   return res.data;
 };

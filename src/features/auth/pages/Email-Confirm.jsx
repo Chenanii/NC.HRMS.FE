@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Loader, Mail, ArrowRight, Building, User, Globe, AlertTriangle } from 'lucide-react';
+import { apiClient } from '../../utilits/apiClient';
 
 const EmailConfirmPage = () => {
   const [confirmationState, setConfirmationState] = useState('loading'); // 'loading', 'success', 'error', 'invalid'
@@ -21,57 +22,36 @@ const EmailConfirmPage = () => {
           setErrorMessage('Invalid confirmation link. Missing required parameters.');
           return;
         }
-
-        const API_BASE_URL = "https://nexacircuit-hrms.com/api/Auth";
-
-        // API call for email confirmation
-        const response = await fetch(`${API_BASE_URL}/confirm-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: userId,
-            token: decodeURIComponent(token)
-          })
+        const res = await apiClient.post(`/api/Auth/confirm-email`, {
+          userId,
+          token: decodeURIComponent(token),
         });
 
-        if (response.ok) {
-          const result = await response.json();
-          
-          // Check if the response indicates an error
-          if (result.isError) {
-            setConfirmationState('error');
-            setErrorMessage(result.message || 'Email confirmation failed.');
-          } else {
-            // Success case
-            setConfirmationState('success');
-            
-            // Extract user information from the result if available
-            if (result.result) {
-              setUserEmail(result.result.email || 'your email');
-              setFirstName(result.result.firstName || '');
-            } else {
-              setUserEmail('your email');
-            }
-          }
-        } else {
-          // Handle HTTP errors
-          const errorData = await response.json();
+        const result = res.data;
+
+        if (result?.isError) {
           setConfirmationState('error');
-          
-          if (response.status === 400) {
-            setErrorMessage(errorData.message || 'Invalid or expired confirmation link.');
-          } else if (response.status === 500) {
-            setErrorMessage(errorData.message || 'An error occurred while confirming email.');
+          setErrorMessage(result.message || 'Email confirmation failed.');
+        } else {
+          setConfirmationState('success');
+          if (result?.result) {
+            setUserEmail(result.result.email || 'your email');
+            setFirstName(result.result.firstName || '');
           } else {
-            setErrorMessage('An unexpected error occurred. Please try again later.');
+            setUserEmail('your email');
           }
         }
       } catch (error) {
-        console.error('Email confirmation error:', error);
         setConfirmationState('error');
-        setErrorMessage('Network error. Please check your connection and try again.');
+        const status = error?.response?.status;
+        const message =
+          error?.response?.data?.message ||
+          (status === 400
+            ? 'Invalid or expired confirmation link.'
+            : status === 500
+              ? 'An error occurred while confirming email.'
+              : 'Network error. Please check your connection and try again.');
+        setErrorMessage(message);
       }
     };
 

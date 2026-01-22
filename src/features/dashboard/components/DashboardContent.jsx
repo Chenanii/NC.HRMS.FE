@@ -9,25 +9,33 @@ import {
   PlusCircle
 } from "lucide-react";
 import {
+  Bar,
+  BarChart,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
   getEmployeeStatistics,
   getLeaveStatistics,
   getOnboardingStatistics,
   getDepartmentHeadcount
 } from "../services/analyticsService"; 
+import { hasPermission } from "../../utilits/auth";
 
-const getPermissions = () => {
-  try {
-    
-    const permissionsInfo = getUserPermissions();
-    return permissionsInfo || [];
-  } catch {
-    return [];
-  }
-};
-
-const hasPermission = (permission) => {
-  const permissions = getPermissions();
-  return permissions.includes(permission);
+const normalizeArray = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.items)) return data.items;
+  if (Array.isArray(data.result)) return data.result;
+  if (Array.isArray(data.data)) return data.data;
+  if (Array.isArray(data.departments)) return data.departments;
+  return [];
 };
 
 const QuickActions = () => {
@@ -62,26 +70,32 @@ const QuickActions = () => {
   );
 };
 // Dashboard Stats Card Component
-const StatsCard = ({ icon: Icon, title, value, change, changeType }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-600 mb-1">{title}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        {change && (
-          <p className={`text-sm mt-1 ${
-            changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-          }`}>
-            {changeType === 'positive' ? '↗' : '↘'} {change}
-          </p>
-        )}
-      </div>
-      <div className="p-3 bg-blue-50 rounded-lg">
-        <Icon size={24} className="text-blue-600" />
+const StatsCard = ({ icon: Icon, title, value, change, changeType }) => {
+  const iconEl = Icon
+    ? React.createElement(Icon, { size: 24, className: "text-blue-600" })
+    : null;
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-600 mb-1">{title}</p>
+          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          {change && (
+            <p
+              className={`text-sm mt-1 ${
+                changeType === "positive" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {changeType === "positive" ? "↗" : "↘"} {change}
+            </p>
+          )}
+        </div>
+        <div className="p-3 bg-blue-50 rounded-lg">{iconEl}</div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Recent Activity Component
 const RecentActivity = () => {
@@ -115,6 +129,9 @@ const RecentActivity = () => {
 const DashboardContent = () => {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [deptHeadcountData, setDeptHeadcountData] = useState([]);
+  const [leaveBreakdownData, setLeaveBreakdownData] = useState([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -161,8 +178,26 @@ const DashboardContent = () => {
             changeType: departments?.changeType ?? "neutral"
           }
         ]);
+
+        // Department headcount chart (bar)
+        const deptItems = normalizeArray(departments).map((d) => ({
+          name: d.departmentName || d.name || d.department || "Department",
+          headcount: Number(d.headcount ?? d.count ?? d.total ?? 0),
+        }));
+        setDeptHeadcountData(deptItems);
+
+        // Leave breakdown chart (pie)
+        const pending = Number(leaves?.pending ?? 0);
+        const approved = Number(leaves?.approved ?? 0);
+        const rejected = Number(leaves?.rejected ?? 0);
+        const breakdown = [
+          { name: "Pending", value: pending, color: "#f59e0b" },
+          { name: "Approved", value: approved, color: "#10b981" },
+          { name: "Rejected", value: rejected, color: "#ef4444" },
+        ].filter((x) => x.value > 0);
+        setLeaveBreakdownData(breakdown);
       } catch (err) {
-        console.error("Error fetching stats:", err);
+        setError(err?.message || "Failed to load dashboard analytics.");
       } finally {
         setLoading(false);
       }
@@ -182,11 +217,65 @@ const DashboardContent = () => {
         <p className="text-gray-600">Welcome back! Here's what's happening with your team.</p>
       </div>
 
+      {error && (
+        <div className="mb-6 p-3 bg-red-100 text-red-700 rounded">{error}</div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Department headcount</h3>
+          {deptHeadcountData.length === 0 ? (
+            <div className="text-sm text-gray-500">No department headcount data.</div>
+          ) : (
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={deptHeadcountData}>
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} height={60} />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="headcount" name="Employees" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Leave status breakdown</h3>
+          {leaveBreakdownData.length === 0 ? (
+            <div className="text-sm text-gray-500">No leave breakdown data.</div>
+          ) : (
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Tooltip />
+                  <Legend />
+                  <Pie
+                    data={leaveBreakdownData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={55}
+                    outerRadius={90}
+                    paddingAngle={2}
+                  >
+                    {leaveBreakdownData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Quick Actions + Recent Activity */}

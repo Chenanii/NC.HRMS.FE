@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Mail, Lock, Eye, EyeOff, Building, User, Globe } from "lucide-react";
 import { login, loginWithGoogle } from "../services/authService";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "", remember: false });
@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const googleButtonRef = useRef(null);
 
   const handleChange = (e) => {
@@ -32,7 +33,8 @@ export default function LoginPage() {
       localStorage.setItem("nc_hrms_permissions", JSON.stringify(requestResponse.result.permissions));
       localStorage.setItem("nc_hrms_user", JSON.stringify(requestResponse.result.user));
 
-      navigate("/dashboard");
+      const returnTo = location.state?.returnTo;
+      navigate(returnTo || "/dashboard", { replace: true });
       
     } catch (err) {
       setError(err.message);
@@ -52,13 +54,14 @@ export default function LoginPage() {
       localStorage.setItem("nc_hrms_permissions", JSON.stringify(requestResponse.result.permissions));
       localStorage.setItem("nc_hrms_user", JSON.stringify(requestResponse.result.user));
 
-      navigate("/dashboard");
+      const returnTo = location.state?.returnTo;
+      navigate(returnTo || "/dashboard", { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
       setGoogleLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, location.state]);
 
   useEffect(() => {
     // Load Google Identity Services script

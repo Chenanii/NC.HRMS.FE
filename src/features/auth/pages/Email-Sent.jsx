@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Clock, RefreshCw, Check, ArrowLeft, Building, User, Globe } from 'lucide-react';
+import { apiClient } from '../../utilits/apiClient';
 
 const EmailSentPage = () => {
   const [email, setEmail] = useState('');
@@ -39,17 +40,10 @@ const EmailSentPage = () => {
     setErrorMessage('');
     
     try {
-      const response = await fetch('https://nexacircuit-hrms.com/api/Auth/resend-confirmation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email }),
-      });
+      const res = await apiClient.post('/api/Auth/resend-confirmation', { email });
+      const data = res.data;
 
-      const data = await response.json();
-
-      if (response.ok && !data.isError) {
+      if (!data?.isError) {
         setShowSuccess(true);
         setResendCooldown(60);
         setTimeout(() => setShowSuccess(false), 3000);
@@ -57,7 +51,6 @@ const EmailSentPage = () => {
         throw new Error(data.message || 'Failed to resend confirmation email');
       }
     } catch (error) {
-      console.error('Failed to resend email:', error);
       setErrorMessage(error.message || 'Failed to resend email. Please try again.');
       setShowError(true);
       setTimeout(() => setShowError(false), 5000);

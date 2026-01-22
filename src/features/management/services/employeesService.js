@@ -1,73 +1,58 @@
-import axios from "axios";
+import { apiClient } from "../../utilits/apiClient";
 
-const API_BASE = "https://nexacircuit-hrms.com/api/employees";
-
-const getToken = () => localStorage.getItem("nc_hrms_token");
+const EMPLOYEES_BASE = "/api/employees";
+const USERS_BASE = "/api/users";
+const ROLES_BASE = "/api/roles";
 
 export const fetchEmployees = async () => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/getallemployees`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${EMPLOYEES_BASE}/getallemployees`);
 
   return res.data.result || [];
 };
 
 
 export const createEmployee = async (data) => {
-  const token = getToken();
-  const res = await axios.post(`${API_BASE}/createemployee`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.post(`${EMPLOYEES_BASE}/createemployee`, data);
   return res.data;
 };
 
 export const updateEmployee = async (id, data) => {
-  const token = getToken();
-  console.log("Updating employee with ID:", id, "Data:", data);
-  const res = await axios.put(`${API_BASE}/updateemployee/${id}`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.put(`${EMPLOYEES_BASE}/updateemployee/${id}`, data);
   return res.data;
 };
 
 export const fetchEmployeeById = async (id) => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/getemployeebyid/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${EMPLOYEES_BASE}/getemployeebyid/${id}`);
   return res.data;
 };
 
 export const fetchEmployeeByNumber = async (employeeNumber) => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/by-number/${employeeNumber}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${EMPLOYEES_BASE}/by-number/${employeeNumber}`);
   return res.data;
 };
 
 export const fetchEmployeesByDepartment = async (departmentId) => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/department/${departmentId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${EMPLOYEES_BASE}/department/${departmentId}`);
   return res.data || [];
 };
 
 export const fetchDirectReports = async (managerId) => {
-  const token = getToken();
-  const res = await axios.get(`${API_BASE}/manager/direct-reports/${managerId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await apiClient.get(`${EMPLOYEES_BASE}/manager/direct-reports/${managerId}`);
   return res.data || [];
 };
 
 export const terminateEmployee = async (id, data) => {
-  const token = getToken();
-  const res = await axios.delete(`${API_BASE}/terminate/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    data, 
-  });
+  const res = await apiClient.delete(`${EMPLOYEES_BASE}/terminate/${id}`, { data });
   return res.data;
+};
+
+
+export const inviteUserForEmployee  = async (userData) => {
+  const res = await apiClient.post(`${USERS_BASE}/invite`, { userData });
+  return res.data;
+};
+
+export const fetchRoles = async () => {
+  const res = await apiClient.get(`${ROLES_BASE}/getroles`);
+  return res.data.result || [];
 };
