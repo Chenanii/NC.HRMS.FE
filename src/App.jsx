@@ -4,7 +4,7 @@ import LoginPage from './features/auth/pages/LoginPage';
 import Register from './features/auth/pages/Register'; 
 import LandingPage from './features/home/LandingPage'; 
 import EmailSent from './features/auth/pages/Email-Sent'; 
-import EmailConfirm from './features/auth/pages/Email-Confirm'; 
+import EmailConfirm from './features/auth/pages/Confirm-Email'; 
 import Employees from './features/management/pages/Employees';
 import Departments from './features/management/pages/Departments';
 import Positions from './features/management/pages/Positions';
@@ -69,7 +69,7 @@ function App() {
           }
         />
         <Route
-          path="/email-confirm"
+          path="/confirm-email"
           element={
             <Container size="sm" mt="xl">
               <EmailConfirm />
