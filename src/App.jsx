@@ -23,12 +23,14 @@ import RequirePermission from './features/auth/components/RequirePermission';
 import Dashboard from './features/dashboard/pages/Dashboard';
 
 // User management routes
-import UserListPage from './features/users/pages/UserListPage';
+import SystemUsers from './features/users/pages/SystemUsers';
 import UserForm from './features/users/components/UserForm';
 
 
 //for toast notifications
 import { Toaster } from "react-hot-toast";
+import Roles from './features/roles/pages/roles';
+import SystemSettings from './features/system_settings/pages/system_settings';
 
 function App() {
   return (
@@ -79,7 +81,6 @@ function App() {
 
         {/* Protected routes (after login) */}
         <Route
-          path="/dashboard"
           element={
             <RequireAuth>
               <Dashboard />
@@ -87,7 +88,7 @@ function App() {
           }
         >
           {/* index route for /dashboard */}
-          <Route index element={ <DashboardContent/>  } />
+        <Route path="/dashboard" element={<DashboardContent />} />
 
           {/* Nested management routes */}
           <Route
@@ -136,11 +137,20 @@ function App() {
           <Route path="leave/my-leave-requests" element={<MyLeaveRequests /> } />
 
           {/* User management routes inside dashboard */}
+
+         <Route
+            path="settings/roles"
+            element={
+              <RequirePermission anyOf={["roles.view"]}>
+                <Roles />
+              </RequirePermission>
+            }
+          />
           <Route
-            path="users"
+            path="settings/systemusers"
             element={
               <RequirePermission anyOf={["users.view"]}>
-                <UserListPage />
+                <SystemUsers />
               </RequirePermission>
             }
           />
@@ -166,7 +176,16 @@ function App() {
             path="settings/users"
             element={
               <RequirePermission anyOf={["users.view"]}>
-                <UserListPage />
+                <SystemUsers />
+              </RequirePermission>
+            }
+          />
+
+          <Route
+            path="settings/systemsettings"
+            element={
+              <RequirePermission anyOf={["tenants.view"]}>
+                <SystemSettings />
               </RequirePermission>
             }
           />

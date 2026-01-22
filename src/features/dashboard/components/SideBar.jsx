@@ -18,7 +18,7 @@ import { hasPermission } from '../../utilits/auth';
 import logoblack from "../../../assets/images/logo-black.png";
 
 const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
-  const [expandedSections, setExpandedSections] = useState(['management']);
+  const [expandedSections, setExpandedSections] = useState(['']);
 
   const toggleSection = (section) => {
     setExpandedSections(prev =>
@@ -48,7 +48,6 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
         icon: Users,
         path: 'management/employees', 
         permission: 'employees.view',
-        badge: '124'
       },
       {
         id: 'departments',
@@ -76,29 +75,28 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
         id: 'leave-requests',
         label: 'Leave Requests',
         icon: Calendar,
-        path: '/dashboard/leave/leave-requests', 
+        path: '/leave/leave-requests', 
         permission: 'leave.view_all',
-        badge: '7'
       },
       {
         id: 'leave-types',
         label: 'Leave Types',
         icon: Calendar,
-        path: '/dashboard/leave/leave-types', 
+        path: '/leave/leave-types', 
         permission: 'leavetypes.view'
       },
       {
         id: 'request-leave',
         label: 'Request Leave',
         icon: Calendar,
-        path: '/dashboard/leave/request-leave',
+        path: '/leave/request-leave',
         permission: 'leave.create',
       },
       {
         id: 'my-leave-requests',
         label: 'My Leave Requests',
         icon: Calendar,
-        path: '/dashboard/leave/my-leave-requests',
+        path: '/leave/my-leave-requests',
       },
     ]
   },
@@ -106,7 +104,7 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
     id: 'documents',
     label: 'Documents',
     icon: FileText,
-    path: '/dashboard/documents',
+    path: '/documents',
     permission: 'documents.view_all'
   },
   {
@@ -119,14 +117,14 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
         id: 'onboarding-tasks',
         label: 'Tasks',
         icon: UserCheck,
-        path: '/dashboard/onboarding/tasks', 
+        path: '/onboarding/tasks', 
         permission: 'onboardingtasks.view'
       },
       {
         id: 'onboarding-templates',
         label: 'Templates',
         icon: FileText,
-        path: '/dashboard/onboarding/templates',
+        path: '/onboarding/templates',
         permission: 'onboardingtemplates.view'
       }
     ]
@@ -135,7 +133,7 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
     id: 'payroll',
     label: 'Payroll',
     icon: DollarSign,
-    path: '/dashboard/payroll',
+    path: '/payroll',
     permission: 'payroll.view',
     badge: 'New'
   },
@@ -143,7 +141,7 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
     id: 'analytics',
     label: 'Analytics',
     icon: BarChart3,
-    path: '/dashboard/analytics',
+    path: '/analytics',
     permission: 'analytics.view'
   },
   {
@@ -156,21 +154,21 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
         id: 'users',
         label: 'Users',
         icon: Users,
-        path: '/dashboard/settings/users',
+        path: 'settings/systemusers',
         permission: 'users.view'
       },
       {
         id: 'roles',
         label: 'Roles',
         icon: Shield,
-        path: '/dashboard/settings/roles',
+        path: 'settings/roles',
         permission: 'roles.view'
       },
       {
         id: 'system',
-        label: 'System',
+        label: 'SystemSettings',
         icon: Settings,
-        path: '/dashboard/settings/system',
+        path: '/settings/systemsettings',
         permission: 'settings.edit'
       }
     ]

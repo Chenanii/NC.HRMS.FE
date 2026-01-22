@@ -1,19 +1,19 @@
+import { User } from "lucide-react";
 import { apiClient } from "../../utilits/apiClient";
 
 const EMPLOYEES_BASE = "/api/employees";
 const DEPARTMENTS_BASE = "/api/departments";
 const POSITIONS_BASE = "/api/positions";
+const USERS_BASE = "/api/users";
 
 export const fetchUsers = async () => {
-  const res = await apiClient.get(`${EMPLOYEES_BASE}/getallemployees`);
+  const res = await apiClient.get(`${USERS_BASE}/`);
+  console.log("Fetched users:", res.data);
   return res.data;
 };
-export const createUser = async (employee) => {
-  const res = await apiClient.post(`${EMPLOYEES_BASE}/createemployee`, employee);
-  return res.data;
-};
-export const updateUser = async (id, employee) => {
-  const res = await apiClient.put(`${EMPLOYEES_BASE}/updateemployee/${id}`, employee);
+
+export const updateUser = async (id, user) => {
+  const res = await apiClient.put(`${USERS_BASE}/updateuser/${id}`, user);
   return res.data;
 };
 export const deleteUser = async (id) => {

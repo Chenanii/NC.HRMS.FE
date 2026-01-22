@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { createUser, updateUser, fetchDepartments, fetchPositions } from "../services/userService";
+import { updateUser, fetchDepartments, fetchPositions } from "../services/userService";
 import { TextInput, Button, Group, Select } from "@mantine/core";
 import toast from "react-hot-toast";
 
@@ -76,7 +76,6 @@ export default function UserForm({ onSuccess, initialData, isEdit }) {
         await updateUser(initialData.id, formData);
         toast.success("Employee updated.");
       } else {
-        await createUser(formData);
         toast.success("Employee created.");
       }
       if (onSuccess) onSuccess();
