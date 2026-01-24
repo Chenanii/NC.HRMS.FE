@@ -47,3 +47,8 @@ export const getPendingLeaveRequests = async (managerId = null) => {
   });
   return response.data;
 };
+
+export const getLeavePolicies = async () => {
+  const res = await apiClient.get(`${LEAVE_TYPE_BASE}/getallleavetypes`);
+  return res.data || [];
+};
