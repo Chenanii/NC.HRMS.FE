@@ -31,6 +31,10 @@ import UserForm from './features/users/components/UserForm';
 import { Toaster } from "react-hot-toast";
 import Roles from './features/roles/pages/roles';
 import SystemSettings from './features/system_settings/pages/system_settings';
+import Documents from './features/documents/pages/Documents';
+import OnboardingTasks from './features/onboarding/pages/OnboardingTasks';
+import OnboardingTemplates from './features/onboarding/pages/OnboardingTemplates';
+import Analytics from './features/analytics/pages/Analytics';
 
 function App() {
   return (
@@ -186,6 +190,44 @@ function App() {
             element={
               <RequirePermission anyOf={["tenants.view"]}>
                 <SystemSettings />
+              </RequirePermission>
+            }
+          />
+
+          {/* Documents route */}
+          <Route
+            path="documents"
+            element={
+              <RequirePermission anyOf={["documents.view", "documents.view_all"]}>
+                <Documents />
+              </RequirePermission>
+            }
+          />
+
+          {/* Onboarding routes */}
+          <Route
+            path="onboarding/tasks"
+            element={
+              <RequirePermission anyOf={["onboardingtasks.view"]}>
+                <OnboardingTasks />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="onboarding/templates"
+            element={
+              <RequirePermission anyOf={["onboardingtemplates.view"]}>
+                <OnboardingTemplates />
+              </RequirePermission>
+            }
+          />
+
+          {/* Analytics route */}
+          <Route
+            path="analytics"
+            element={
+              <RequirePermission anyOf={["analytics.view"]}>
+                <Analytics />
               </RequirePermission>
             }
           />

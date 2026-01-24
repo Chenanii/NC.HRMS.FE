@@ -104,7 +104,7 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
     id: 'documents',
     label: 'Documents',
     icon: FileText,
-    path: '/documents',
+    path: 'documents',
     permission: 'documents.view_all'
   },
   {
@@ -117,14 +117,14 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
         id: 'onboarding-tasks',
         label: 'Tasks',
         icon: UserCheck,
-        path: '/onboarding/tasks', 
+        path: 'onboarding/tasks', 
         permission: 'onboardingtasks.view'
       },
       {
         id: 'onboarding-templates',
         label: 'Templates',
         icon: FileText,
-        path: '/onboarding/templates',
+        path: 'onboarding/templates',
         permission: 'onboardingtemplates.view'
       }
     ]
@@ -141,7 +141,7 @@ const Sidebar = ({ isOpen, onClose, onItemSelect }) => {
     id: 'analytics',
     label: 'Analytics',
     icon: BarChart3,
-    path: '/analytics',
+    path: 'analytics',
     permission: 'analytics.view'
   },
   {
