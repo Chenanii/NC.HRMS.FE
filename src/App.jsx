@@ -13,6 +13,9 @@ import LeaveRequests from './features/leave/pages/leave-requests';
 import RequestLeave from './features/leave/pages/request-leave';
 import MyLeaveRequests from './features/leave/pages/my-leave-requests';
 
+import Subscriptions from './features/subscriptions/pages/Subscriptions';
+import Subscribe from './features/subscriptions/pages/Subscribe';
+
 
 import DashboardContent from './features/dashboard/components/DashboardContent';
 import './index.css';
@@ -79,6 +82,24 @@ function App() {
           element={
             <Container size="sm" mt="xl">
               <EmailConfirm />
+            </Container>
+          }
+        />
+
+        <Route 
+          path="/subscriptions"
+          element={
+            <Container size="sm" mt="xl">
+              <Subscriptions />
+            </Container>
+          }
+        />
+
+        <Route 
+          path="/subscribe"
+          element={
+            <Container size="sm" mt="xl">
+              <Subscribe />
             </Container>
           }
         />
